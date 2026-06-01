@@ -650,12 +650,12 @@ a {
   navigation: auto;
 }
 
-/* The header is identical across pages — give it its own name so it stays
-   steady while only the page content animates. */
-.site-header {
-  view-transition-name: site-header;
-}
-
+/* A gentle full-page crossfade. We deliberately do NOT give individual
+   elements (e.g. the header) a view-transition-name: a named group animates
+   its captured size, and the header's width (a flex item using width:100%)
+   resolves against a shrink-to-fit box during capture, so it gets snapshotted
+   at content width and then animates out to full width (a narrow -> wide
+   flash). A plain root crossfade fades in place and can't change width. */
 @keyframes vt-fade-out {
   to {
     opacity: 0;
@@ -665,16 +665,15 @@ a {
 @keyframes vt-fade-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
 }
 
 ::view-transition-old(root) {
-  animation: vt-fade-out 160ms var(--ease) both;
+  animation: vt-fade-out 150ms var(--ease) both;
 }
 
 ::view-transition-new(root) {
-  animation: vt-fade-in 260ms var(--ease) both;
+  animation: vt-fade-in 220ms var(--ease) both;
 }
 
 /* ---------- Motion preferences ---------- */
