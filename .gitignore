@@ -20,3 +20,4 @@ my-project/
 __pycache__/
 # migration log
 migration-failed-images.json
+.tmp-shots/

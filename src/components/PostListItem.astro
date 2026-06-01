@@ -20,6 +20,6 @@ const excerpt = excerptHtml(post);
     </h2>
     <PostMeta date={post.data.date} from={post.data.from} />
     {excerpt && <div class="post-excerpt" set:html={excerpt} />}
-    {hasMore(post) && <a class="read-more" href={href}>...阅读全文</a>}
+    {hasMore(post) && <a class="read-more" href={href}>阅读全文</a>}
   </article>
 </li>

@@ -36,6 +36,18 @@ const url = new URL(Astro.url.pathname, Astro.site).href;
     <div class="post-content">
       <Content />
     </div>
+    {
+      post.data.tags.length > 0 && (
+        <div class="post-tags">
+          <span class="label">标签</span>
+          {post.data.tags.map((tag) => (
+            <a class="tag-chip" href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>
+              {tag}
+            </a>
+          ))}
+        </div>
+      )
+    }
   </article>
 
   <Paginator

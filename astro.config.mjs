@@ -18,8 +18,13 @@ export default defineConfig({
         showLineNumbers: true,
       },
       styleOverrides: {
-        borderRadius: '6px',
-        codeFontSize: '0.85rem',
+        borderRadius: '8px',
+        codeFontSize: '0.84rem',
+        codeLineHeight: '1.65',
+        borderColor: 'var(--hairline)',
+        frames: {
+          shadowColor: 'transparent',
+        },
       },
     }),
     sitemap(),
