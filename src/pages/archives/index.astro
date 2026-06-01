@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getSortedPosts, postPath } from '../../utils/posts';
+import { withBase } from '../../utils/url';
+
+const posts = await getSortedPosts();
+
+// Group newest-first posts by year, preserving order.
+const byYear: { year: number; posts: typeof posts }[] = [];
+for (const post of posts) {
+  const year = post.data.date.getFullYear();
+  const last = byYear[byYear.length - 1];
+  if (last && last.year === year) last.posts.push(post);
+  else byYear.push({ year, posts: [post] });
+}
+
+const monthDay = new Intl.DateTimeFormat('zh-CN', { month: '2-digit', day: '2-digit' });
+---
+
+<BaseLayout title="归档">
+  <h1 class="page-title">归档</h1>
+  {
+    byYear.map(({ year, posts }) => (
+      <section>
+        <h2 class="archive-year">{year}</h2>
+        <ul class="archive-list">
+          {posts.map((post) => (
+            <li class="archive-item">
+              <time datetime={post.data.date.toISOString().slice(0, 10)}>
+                {monthDay.format(post.data.date)}
+              </time>
+              <a class="post-title-link" href={withBase(postPath(post))} set:html={post.data.title} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</BaseLayout>

@@ -1,0 +1,36 @@
+---
+import { DISQUS_SHORTNAME } from '../consts';
+
+interface Props {
+  // Stable thread id; must match the old Hexo page.path to keep existing
+  // comment threads (e.g. "post/why-not-try-linux/").
+  identifier: string;
+  // Canonical page URL used by Disqus, matching the old config.url + path.
+  url: string;
+  title: string;
+}
+
+const { identifier, url, title } = Astro.props;
+---
+
+<section class="comments">
+  <div id="disqus_thread"></div>
+  <script is:inline define:vars={{ DISQUS_SHORTNAME, identifier, url, title }}>
+    var disqus_config = function () {
+      this.page.identifier = identifier;
+      this.page.url = url;
+      this.page.title = title;
+    };
+    (function () {
+      var d = document,
+        s = d.createElement('script');
+      s.src = 'https://' + DISQUS_SHORTNAME + '.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript
+    >Please enable JavaScript to view the
+    <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript
+  >
+</section>

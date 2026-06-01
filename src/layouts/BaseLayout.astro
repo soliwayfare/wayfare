@@ -1,0 +1,55 @@
+---
+import { SITE } from '../consts';
+import { withBase } from '../utils/url';
+import Nav from '../components/Nav.astro';
+import GoogleAnalytics from '../components/GoogleAnalytics.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE.title}` : SITE.title;
+const metaDesc = description || SITE.description;
+const year = new Date().getFullYear();
+const copyrightYears = year === SITE.startYear ? `${year}` : `${SITE.startYear} - ${year}`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={metaDesc} />
+    <meta name="author" content={SITE.author} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/atom+xml" title={SITE.title} href={withBase('/atom.xml')} />
+    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site-header">
+        <a class="logo-link" href={withBase('/')}>
+          <h1>{SITE.title}</h1>
+        </a>
+        <Nav />
+      </header>
+      <main class="container">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <p>
+          © {copyrightYears}
+          <a href="https://www.cnwangjie.com/">{SITE.author}</a>, powered by{' '}
+          <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>.
+        </p>
+      </footer>
+    </div>
+    <GoogleAnalytics />
+  </body>
+</html>

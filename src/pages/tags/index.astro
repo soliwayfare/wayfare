@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getTagMap } from '../../utils/tags';
+import { withBase } from '../../utils/url';
+
+const tagMap = await getTagMap();
+const tags = [...tagMap.entries()].sort((a, b) => b[1].length - a[1].length);
+---
+
+<BaseLayout title="标签">
+  <h1 class="page-title">标签</h1>
+  {
+    tags.length === 0 ? (
+      <p>暂无标签。</p>
+    ) : (
+      <div class="tag-cloud">
+        {tags.map(([tag, posts]) => (
+          <a class="tag-chip" href={withBase(`/tags/${encodeURIComponent(tag)}/`)}>
+            {tag} <span>({posts.length})</span>
+          </a>
+        ))}
+      </div>
+    )
+  }
+</BaseLayout>

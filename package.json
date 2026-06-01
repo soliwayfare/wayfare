@@ -1,0 +1,24 @@
+{
+  "name": "wayfare",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "migrate": "node scripts/migrate.mjs"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.12",
+    "@astrojs/sitemap": "^3.6.0",
+    "@expressive-code/plugin-line-numbers": "^0.41.3",
+    "astro": "^6.4.2",
+    "astro-expressive-code": "^0.41.3",
+    "marked": "^18.0.4"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3"
+  }
+}

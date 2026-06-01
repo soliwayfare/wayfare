@@ -1,0 +1,22 @@
+---
+import { formatDate, isoDate } from '../utils/date';
+
+interface Props {
+  date: Date;
+  // Source URL for translated posts; renders the "翻译 · 原文地址" link.
+  from?: string;
+}
+
+const { date, from } = Astro.props;
+---
+
+<div class="post-info">
+  <time datetime={isoDate(date)}>{formatDate(date)}</time>
+  {
+    from && (
+      <a class="post-from" href={from} target="_blank" rel="noopener" title={from}>
+        翻译 · 原文地址
+      </a>
+    )
+  }
+</div>

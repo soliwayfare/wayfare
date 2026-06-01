@@ -1,0 +1,49 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostMeta from '../../components/PostMeta.astro';
+import Paginator from '../../components/Paginator.astro';
+import Disqus from '../../components/Disqus.astro';
+import { getSortedPosts, postPath, postSlug } from '../../utils/posts';
+import { withBase } from '../../utils/url';
+
+export const getStaticPaths = (async () => {
+  const posts = await getSortedPosts();
+  return posts.map((post, i) => ({
+    params: { slug: postSlug(post) },
+    props: {
+      post,
+      // "上一篇" -> newer post, "下一篇" -> older post.
+      newer: posts[i - 1] ?? null,
+      older: posts[i + 1] ?? null,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { post, newer, older } = Astro.props;
+const { Content } = await render(post);
+
+// Keep the old Hexo page.path so existing Disqus threads stay attached.
+const identifier = `post/${postSlug(post)}/`;
+const url = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<BaseLayout title={post.data.title} description={post.data.title}>
+  <article class="post-single">
+    <h1 class="post-title" set:html={post.data.title} />
+    <PostMeta date={post.data.date} from={post.data.from} />
+    <div class="post-content">
+      <Content />
+    </div>
+  </article>
+
+  <Paginator
+    prevLabel="上一篇"
+    nextLabel="下一篇"
+    prevUrl={newer ? withBase(postPath(newer)) : null}
+    nextUrl={older ? withBase(postPath(older)) : null}
+  />
+
+  {post.data.comments && <Disqus identifier={identifier} url={url} title={post.data.title} />}
+</BaseLayout>

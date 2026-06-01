@@ -1,0 +1,23 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostListItem from '../../components/PostListItem.astro';
+import { getTagMap } from '../../utils/tags';
+
+export const getStaticPaths = (async () => {
+  const tagMap = await getTagMap();
+  return [...tagMap.entries()].map(([tag, posts]) => ({
+    params: { tag },
+    props: { tag, posts },
+  }));
+}) satisfies GetStaticPaths;
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`标签: ${tag}`}>
+  <h1 class="page-title">标签: {tag}</h1>
+  <ul class="post-list">
+    {posts.map((post) => <PostListItem post={post} />)}
+  </ul>
+</BaseLayout>

@@ -1,0 +1,30 @@
+---
+interface Props {
+  // Resolved hrefs (already base-prefixed) or null when absent.
+  prevLabel: string;
+  nextLabel: string;
+  prevUrl?: string | null;
+  nextUrl?: string | null;
+}
+
+const { prevLabel, nextLabel, prevUrl, nextUrl } = Astro.props;
+---
+
+{
+  (prevUrl || nextUrl) && (
+    <nav class="paginator">
+      {prevUrl ? (
+        <a class="prev" href={prevUrl}>
+          {prevLabel}
+        </a>
+      ) : (
+        <span />
+      )}
+      {nextUrl && (
+        <a class="next" href={nextUrl}>
+          {nextLabel}
+        </a>
+      )}
+    </nav>
+  )
+}

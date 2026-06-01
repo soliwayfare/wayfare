@@ -1,0 +1,25 @@
+---
+import type { Post } from '../utils/posts';
+import { postPath, excerptHtml, hasMore } from '../utils/posts';
+import { withBase } from '../utils/url';
+import PostMeta from './PostMeta.astro';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const href = withBase(postPath(post));
+const excerpt = excerptHtml(post);
+---
+
+<li class="post-list-item">
+  <article>
+    <h2 class="post-title">
+      <a class="post-title-link" href={href} set:html={post.data.title} />
+    </h2>
+    <PostMeta date={post.data.date} from={post.data.from} />
+    {excerpt && <div class="post-excerpt" set:html={excerpt} />}
+    {hasMore(post) && <a class="read-more" href={href}>...阅读全文</a>}
+  </article>
+</li>

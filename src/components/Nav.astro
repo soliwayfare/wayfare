@@ -1,0 +1,28 @@
+---
+import { NAV } from '../consts';
+import { withBase } from '../utils/url';
+
+// Current path (without the base prefix) for active-link highlighting.
+const current = Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '') || '/';
+---
+
+<ul class="nav">
+  {
+    NAV.map((item) => {
+      const href = item.external ? item.href : withBase(item.href);
+      const active = !item.external && current === item.href;
+      return (
+        <li>
+          <a
+            href={href}
+            class={active ? 'active' : undefined}
+            target={item.external ? '_blank' : undefined}
+            rel={item.external ? 'noopener' : undefined}
+          >
+            {item.label}
+          </a>
+        </li>
+      );
+    })
+  }
+</ul>

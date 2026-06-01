@@ -1,0 +1,40 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostListItem from '../../components/PostListItem.astro';
+import Paginator from '../../components/Paginator.astro';
+import { getSortedPosts } from '../../utils/posts';
+import { withBase } from '../../utils/url';
+import { PER_PAGE } from '../../consts';
+
+// Pages 2..N live at /page/N/; page 1 is the site index (/).
+export const getStaticPaths = (async () => {
+  const posts = await getSortedPosts();
+  const totalPages = Math.ceil(posts.length / PER_PAGE);
+  const paths = [];
+  for (let n = 2; n <= totalPages; n++) {
+    paths.push({
+      params: { page: String(n) },
+      props: {
+        pageNum: n,
+        totalPages,
+        pagePosts: posts.slice((n - 1) * PER_PAGE, n * PER_PAGE),
+      },
+    });
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+const { pageNum, totalPages, pagePosts } = Astro.props;
+
+// "上一页" -> newer (lower) page, "下一页" -> older (higher) page.
+const prevUrl = pageNum === 2 ? withBase('/') : withBase(`/page/${pageNum - 1}/`);
+const nextUrl = pageNum < totalPages ? withBase(`/page/${pageNum + 1}/`) : null;
+---
+
+<BaseLayout title={`第 ${pageNum} 页`}>
+  <ul class="post-list">
+    {pagePosts.map((post) => <PostListItem post={post} />)}
+  </ul>
+  <Paginator prevLabel="上一页" nextLabel="下一页" prevUrl={prevUrl} nextUrl={nextUrl} />
+</BaseLayout>
