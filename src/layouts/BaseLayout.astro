@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../consts';
 import { withBase } from '../utils/url';
 import Nav from '../components/Nav.astro';
@@ -30,10 +31,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <link rel="alternate" type="application/atom+xml" title={SITE.title} href={withBase('/atom.xml')} />
     <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
     <meta name="generator" content={Astro.generator} />
+    <ClientRouter />
   </head>
   <body>
     <div class="wrap">
-      <header class="site-header">
+      <header class="site-header" transition:persist>
         <a class="logo-link" href={withBase('/')}>
           <h1>{SITE.title}</h1>
         </a>
@@ -42,7 +44,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       <main class="container">
         <slot />
       </main>
-      <footer class="site-footer">
+      <footer class="site-footer" transition:persist>
         <p>
           © {copyrightYears}
           <a href="https://www.cnwangjie.com/">{SITE.author}</a>, powered by{' '}
@@ -51,5 +53,47 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       </footer>
     </div>
     <GoogleAnalytics />
+
+    <script>
+      import { DISQUS_SHORTNAME } from '../consts';
+
+      const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+      // The header is persisted across navigations (transition:persist), so its
+      // build-time active nav state would go stale. Recompute it on each load.
+      function syncActiveNav() {
+        const path = location.pathname.replace(BASE, '') || '/';
+        document.querySelectorAll<HTMLAnchorElement>('.nav a[data-path]').forEach((a) => {
+          a.classList.toggle('active', a.dataset.path === path);
+        });
+      }
+
+      // Load (or reset) Disqus for the current post. With <ClientRouter /> the
+      // page never fully reloads, so this runs on every navigation and reads
+      // the per-post values from the #disqus_thread data attributes.
+      function loadDisqus() {
+        const el = document.getElementById('disqus_thread');
+        if (!el) return;
+        const w = window as any;
+        w.disqus_config = function () {
+          this.page.identifier = el.dataset.disqusIdentifier;
+          this.page.url = el.dataset.disqusUrl;
+          this.page.title = el.dataset.disqusTitle;
+        };
+        if (w.DISQUS) {
+          w.DISQUS.reset({ reload: true, config: w.disqus_config });
+        } else {
+          const s = document.createElement('script');
+          s.src = `https://${DISQUS_SHORTNAME}.disqus.com/embed.js`;
+          s.setAttribute('data-timestamp', String(+new Date()));
+          document.body.appendChild(s);
+        }
+      }
+
+      document.addEventListener('astro:page-load', () => {
+        syncActiveNav();
+        loadDisqus();
+      });
+    </script>
   </body>
 </html>

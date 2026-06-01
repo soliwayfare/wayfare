@@ -13,6 +13,10 @@
 }
 
 :root {
+  /* Match the UA canvas, scrollbars and form controls to light/dark so the
+     base layer never flashes white (e.g. mid page-transition in dark mode). */
+  color-scheme: light dark;
+
   /* Accent (kept from apollo, used sparingly and intentionally) */
   --accent: #2f9e6e;
   --accent-strong: #247a55;
@@ -79,6 +83,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* Paint the root background so no white base shows during transitions. */
+  background-color: var(--paper);
 }
 
 body {
@@ -645,36 +651,10 @@ a {
   }
 }
 
-/* ---------- View transitions (native cross-document) ---------- */
-@view-transition {
-  navigation: auto;
-}
-
-/* A gentle full-page crossfade. We deliberately do NOT give individual
-   elements (e.g. the header) a view-transition-name: a named group animates
-   its captured size, and the header's width (a flex item using width:100%)
-   resolves against a shrink-to-fit box during capture, so it gets snapshotted
-   at content width and then animates out to full width (a narrow -> wide
-   flash). A plain root crossfade fades in place and can't change width. */
-@keyframes vt-fade-out {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes vt-fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
-::view-transition-old(root) {
-  animation: vt-fade-out 150ms var(--ease) both;
-}
-
-::view-transition-new(root) {
-  animation: vt-fade-in 220ms var(--ease) both;
-}
+/* View transitions are handled by Astro's <ClientRouter /> (client-side
+   navigation + fade), with the header/footer persisted across navigations.
+   Astro injects the transition styles and disables them under
+   prefers-reduced-motion automatically. */
 
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
@@ -687,10 +667,5 @@ a {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-  /* Disable view-transition animations for reduced-motion users. */
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
   }
 }
