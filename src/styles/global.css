@@ -645,6 +645,38 @@ a {
   }
 }
 
+/* ---------- View transitions (native cross-document) ---------- */
+@view-transition {
+  navigation: auto;
+}
+
+/* The header is identical across pages — give it its own name so it stays
+   steady while only the page content animates. */
+.site-header {
+  view-transition-name: site-header;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+::view-transition-old(root) {
+  animation: vt-fade-out 160ms var(--ease) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-fade-in 260ms var(--ease) both;
+}
+
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -656,5 +688,10 @@ a {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  /* Disable view-transition animations for reduced-motion users. */
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
