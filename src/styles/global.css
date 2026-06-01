@@ -46,7 +46,7 @@
   --space-12: 3rem;
   --space-16: 4rem;
 
-  --measure: 40rem; /* ~68 CJK chars / comfortable reading length */
+  --measure: 48rem; /* content column width; fluid below this via 100% width + padding */
   --radius: 8px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --dur: 180ms;
@@ -126,6 +126,7 @@ img {
 
 /* ---------- Header ---------- */
 .site-header {
+  width: 100%;
   max-width: var(--measure);
   margin: 0 auto;
   padding: var(--space-12) 1.5rem var(--space-8);
