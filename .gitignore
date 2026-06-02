@@ -21,3 +21,7 @@ __pycache__/
 # migration log
 migration-failed-images.json
 .tmp-shots/
+
+.dev.vars*
+!.dev.vars.example
+!.env.example
