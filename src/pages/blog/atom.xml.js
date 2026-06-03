@@ -1,8 +1,8 @@
 import rss from '@astrojs/rss';
 import { marked } from 'marked';
-import { getSortedPosts, postPath } from '../utils/posts';
-import { withBase } from '../utils/url';
-import { SITE } from '../consts';
+import { getSortedPosts, postPath } from '../../utils/posts';
+import { withBase } from '../../utils/url';
+import { SITE } from '../../consts';
 
 // Feed served at /blog/atom.xml to preserve the old Hexo subscription URL.
 // Includes full post content (old feed had `content: true`), limited to 10.

@@ -1,20 +1,19 @@
 ---
 import { NAV } from '../consts';
-import { withBase } from '../utils/url';
 
-// Current path (without the base prefix) for active-link highlighting.
-const current = Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '') || '/';
+// NAV hrefs are already full site paths, so the active item is an exact match
+// against the current pathname (home `/` only matches `/`, not `/blog/...`).
+const current = Astro.url.pathname;
 ---
 
 <ul class="nav">
   {
     NAV.map((item) => {
-      const href = item.external ? item.href : withBase(item.href);
       const active = !item.external && current === item.href;
       return (
         <li>
           <a
-            href={href}
+            href={item.href}
             class={active ? 'active' : undefined}
             data-path={item.external ? undefined : item.href}
             target={item.external ? '_blank' : undefined}

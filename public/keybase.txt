@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/wangjie
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://iwj.moe
+  * I am wangjie (https://keybase.io/wangjie) on keybase.
+  * I have a public key ASAxNi-cOWy1ge6tGHhS1SlxMNES5ADmF9Z6tjrAj6vqiwo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "012078145b1ff84a5d56477841300bc6eb42ca321c847cdfa62be089e7ece6c96d7b0a",
+      "host": "keybase.io",
+      "kid": "012031362f9c396cb581eead187852d5297130d112e400e617d67ab63ac08fabea8b0a",
+      "uid": "7f02df7d47aaa606917c1a77b5cd2719",
+      "username": "wangjie"
+    },
+    "merkle_root": {
+      "ctime": 1728535450,
+      "hash": "9e737c090ecb126315d54065ae58563044a0df514e61afa0882621b840ea21dc45832ee7d6774cde6d689069415c38296de44c9652ade9dbc22dcd6179e6041f",
+      "hash_meta": "f8be2aa6bbb2c18eb9ecb5aac424f439f251d14995be77693f75d0b14846ed8e",
+      "seqno": 26191364
+    },
+    "service": {
+      "entropy": "NGOpcA+Lhl64RudrBdNsaXEU",
+      "hostname": "iwj.moe",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "6.5.0"
+  },
+  "ctime": 1728535482,
+  "expire_in": 504576000,
+  "prev": "5c885393206e4d2dd24d06aff33bf816e8d92a33c83872b186b3df4003d4a9aa",
+  "seqno": 53,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgMTYvnDlstYHurRh4UtUpcTDREuQA5hfWerY6wI+r6osKp3BheWxvYWTESpcCNcQgXIhTkyBuTS3STQav8zv4FujZKjPIOHKxhrPfQAPUqarEIG9PyvkpAOKT4wh5v5f4ssmHAqU6QZ/P1X70WYNINb3AAgHCo3NpZ8RAWrBGGkjeAMjY3LU5QnwON0gPS6lM+DGl1/c58UA+W4jhFvdZD0QS4YA/Ohz2Gg08fIfEDDJKC6RvdF4nYFJvB6hzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIJu//pfjnWenULBklYdNw2UAmUQWlHRMuZmACMWhPw94o3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/wangjie
+
+==================================================================

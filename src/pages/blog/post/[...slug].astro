@@ -1,12 +1,12 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostMeta from '../../components/PostMeta.astro';
-import Paginator from '../../components/Paginator.astro';
-import Disqus from '../../components/Disqus.astro';
-import { getSortedPosts, postPath, postSlug } from '../../utils/posts';
-import { withBase } from '../../utils/url';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostMeta from '../../../components/PostMeta.astro';
+import Paginator from '../../../components/Paginator.astro';
+import Disqus from '../../../components/Disqus.astro';
+import { getSortedPosts, postPath, postSlug } from '../../../utils/posts';
+import { withBase } from '../../../utils/url';
 
 export const getStaticPaths = (async () => {
   const posts = await getSortedPosts();

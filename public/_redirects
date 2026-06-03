@@ -1,4 +1,0 @@
-# Cloudflare Pages: serve the site (built with base "/blog") under the /blog
-# path, mirroring the old Vercel rewrite. Files are emitted at the dist root,
-# so strip the /blog prefix when serving.
-/blog/*  /:splat  200

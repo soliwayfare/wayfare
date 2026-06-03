@@ -1,7 +1,7 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getTagMap } from '../../utils/tags';
-import { withBase } from '../../utils/url';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getTagMap } from '../../../utils/tags';
+import { withBase } from '../../../utils/url';
 
 const tagMap = await getTagMap();
 const tags = [...tagMap.entries()].sort((a, b) => b[1].length - a[1].length);

@@ -1,8 +1,8 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostListItem from '../../components/PostListItem.astro';
-import { getTagMap } from '../../utils/tags';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostListItem from '../../../components/PostListItem.astro';
+import { getTagMap } from '../../../utils/tags';
 
 export const getStaticPaths = (async () => {
   const tagMap = await getTagMap();

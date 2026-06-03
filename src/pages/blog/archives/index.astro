@@ -1,7 +1,7 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getSortedPosts, postPath } from '../../utils/posts';
-import { withBase } from '../../utils/url';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getSortedPosts, postPath } from '../../../utils/posts';
+import { withBase } from '../../../utils/url';
 
 const posts = await getSortedPosts();
 

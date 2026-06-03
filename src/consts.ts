@@ -25,11 +25,15 @@ export const GA_ID = 'UA-65598064-1';
 // Posts per page on the paginated index.
 export const PER_PAGE = 10;
 
-// Top navigation menu. External links open in a new tab.
+// The blog is served under this path prefix; the homepage lives at the site root.
+export const BLOG_BASE = '/blog';
+
+// Top navigation menu. `href` values are full, root-absolute site paths.
+// External links open in a new tab.
 export const NAV: { label: string; href: string; external?: boolean }[] = [
-  { label: 'HOME', href: 'https://www.cnwangjie.com/', external: true },
-  { label: 'BLOG', href: '/' },
-  { label: 'ARCHIVE', href: '/archives/' },
-  { label: 'MASTODON', href: '/mastodon/' },
-  { label: 'RSS', href: '/atom.xml' },
+  { label: 'HOME', href: '/' },
+  { label: 'BLOG', href: '/blog/' },
+  { label: 'ARCHIVE', href: '/blog/archives/' },
+  { label: 'MASTODON', href: '/blog/mastodon/' },
+  { label: 'RSS', href: '/blog/atom.xml' },
 ];

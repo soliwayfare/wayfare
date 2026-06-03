@@ -29,7 +29,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="author" content={SITE.author} />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/atom+xml" title={SITE.title} href={withBase('/atom.xml')} />
-    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="generator" content={Astro.generator} />
     <ClientRouter />
   </head>
@@ -47,7 +47,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       <footer class="site-footer" transition:persist>
         <p>
           © {copyrightYears}
-          <a href="https://www.cnwangjie.com/">{SITE.author}</a>, powered by{' '}
+          <a href="/">{SITE.author}</a>, powered by{' '}
           <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>.
         </p>
       </footer>
@@ -57,12 +57,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <script>
       import { DISQUS_SHORTNAME } from '../consts';
 
-      const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
-
       // The header is persisted across navigations (transition:persist), so its
       // build-time active nav state would go stale. Recompute it on each load.
+      // NAV data-path values are full site paths, so compare exactly.
       function syncActiveNav() {
-        const path = location.pathname.replace(BASE, '') || '/';
+        const path = location.pathname;
         document.querySelectorAll<HTMLAnchorElement>('.nav a[data-path]').forEach((a) => {
           a.classList.toggle('active', a.dataset.path === path);
         });

@@ -7,7 +7,6 @@ import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 // https://astro.build
 export default defineConfig({
   site: 'https://www.cnwangjie.com',
-  base: '/blog',
   trailingSlash: 'always',
   integrations: [
     expressiveCode({
@@ -30,8 +29,8 @@ export default defineConfig({
     sitemap(),
   ],
   redirects: {
-    // Old Hexo alias: post/为什么不尝试使用Linux呢？/ -> post/why-not-try-linux/
-    // Astro does not prepend `base` to redirect targets, so include it here.
-    '/post/为什么不尝试使用Linux呢？/': '/blog/post/why-not-try-linux/',
+    // Old Hexo alias: post/为什么不尝试使用Linux呢？/ -> post/why-not-try-linux/.
+    // The blog now lives under /blog/, so both source and target carry it.
+    '/blog/post/为什么不尝试使用Linux呢？/': '/blog/post/why-not-try-linux/',
   },
 });

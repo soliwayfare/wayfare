@@ -1,11 +1,11 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostListItem from '../../components/PostListItem.astro';
-import Paginator from '../../components/Paginator.astro';
-import { getSortedPosts } from '../../utils/posts';
-import { withBase } from '../../utils/url';
-import { PER_PAGE } from '../../consts';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostListItem from '../../../components/PostListItem.astro';
+import Paginator from '../../../components/Paginator.astro';
+import { getSortedPosts } from '../../../utils/posts';
+import { withBase } from '../../../utils/url';
+import { PER_PAGE } from '../../../consts';
 
 // Pages 2..N live at /page/N/; page 1 is the site index (/).
 export const getStaticPaths = (async () => {
