@@ -1,0 +1,123 @@
+---
+// SPA-style navigation loader. With <ClientRouter /> the page swaps without a
+// full reload, so we drive a three-step effect ourselves:
+//   1. the current <main> content animates out (fade + slight rise)
+//   2. a centered spinner shows while the next page is fetched
+//   3. the new <main> content fades in once it's ready
+// The spinner overlay is persisted across swaps (transition:persist) so it
+// survives while <main> is replaced.
+---
+
+<div id="nav-loader" transition:persist aria-hidden="true">
+  <div class="nav-spinner"></div>
+</div>
+
+<style is:global>
+  #nav-loader {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  #nav-loader.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav-spinner {
+    width: 34px;
+    height: 34px;
+    border: 3px solid var(--accent-soft);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: nav-spin 0.7s linear infinite;
+  }
+
+  @keyframes nav-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Content exit: current page fades out and lifts slightly. */
+  main.nav-leaving {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.16s ease, transform 0.16s ease;
+  }
+
+  /* Content enter: new page starts hidden, then transitions back to default. */
+  main.nav-entering {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  main.nav-enter-active {
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-spinner {
+      animation-duration: 1.4s;
+    }
+    main.nav-leaving,
+    main.nav-entering {
+      transform: none;
+    }
+    main.nav-enter-active {
+      transition: opacity 0.2s ease;
+    }
+  }
+</style>
+
+<script>
+  // Tunables (ms). EXIT must match the .nav-leaving transition. MIN_SPIN keeps
+  // the spinner visible long enough to read even when the next page is already
+  // prefetched (fetch resolves instantly), so the effect always lands.
+  const EXIT = 160;
+  const MIN_SPIN = 240;
+
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  const getMain = () => document.querySelector<HTMLElement>('main');
+  const getLoader = () => document.getElementById('nav-loader');
+
+  // Step 1 + 2: animate the current content out, then show the spinner while
+  // the next page loads. We wrap event.loader (the only async hook that runs
+  // before the swap) so the swap waits for our exit animation + min spinner.
+  document.addEventListener('astro:before-preparation', (event) => {
+    const e = event as any;
+    const main = getMain();
+    const original = e.loader as () => Promise<void>;
+    e.loader = async () => {
+      if (main) main.classList.add('nav-leaving');
+      await wait(EXIT);
+      getLoader()?.classList.add('active');
+      const start = performance.now();
+      await original();
+      const elapsed = performance.now() - start;
+      if (elapsed < MIN_SPIN) await wait(MIN_SPIN - elapsed);
+    };
+  });
+
+  // Hide the freshly-swapped content before it paints so it can fade in.
+  document.addEventListener('astro:after-swap', () => {
+    getMain()?.classList.add('nav-entering');
+  });
+
+  // Step 3: drop the spinner and fade the new content in.
+  document.addEventListener('astro:page-load', () => {
+    getLoader()?.classList.remove('active');
+    const main = getMain();
+    if (!main || !main.classList.contains('nav-entering')) return;
+    main.classList.add('nav-enter-active');
+    void main.offsetWidth; // reflow so the next change animates
+    main.classList.remove('nav-entering');
+    setTimeout(() => main.classList.remove('nav-enter-active'), 320);
+  });
+</script>

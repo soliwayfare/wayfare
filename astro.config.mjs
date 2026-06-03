@@ -8,6 +8,12 @@ import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 export default defineConfig({
   site: 'https://www.cnwangjie.com',
   trailingSlash: 'always',
+  // Prefetch link targets on hover/focus so SPA navigations (ClientRouter)
+  // feel instant — the next page is usually already fetched by click time.
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'hover',
+  },
   integrations: [
     expressiveCode({
       themes: ['github-light', 'github-dark'],
