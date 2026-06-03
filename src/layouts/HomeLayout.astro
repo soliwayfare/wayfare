@@ -30,12 +30,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <ClientRouter />
   </head>
   <body class="home">
-    <main class="home-wrap">
-      <section class="home-card">
+    <div class="home-wrap">
+      <header class="home-header">
+        <a class="home-brand" href="/">{SITE.author}</a>
         <Nav />
+      </header>
+      <main class="home-main">
         <slot />
-      </section>
-    </main>
+      </main>
+    </div>
 
     <div class="bg-controls">
       <button class="bg-btn" id="bg-pause" title="Pause" aria-label="Pause background">
@@ -203,14 +206,49 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         position: relative;
         z-index: 1;
         display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding: 1.25rem;
+        gap: 1.25rem;
+      }
+
+      /* Top header: brand left, shared <Nav> right — same structure as the blog
+         header, rendered as a readable glass bar floating over the photo. */
+      .home .home-header {
+        flex-shrink: 0;
+        width: 100%;
+        max-width: 44rem;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-6);
+        padding: 0.7rem 1.4rem;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--paper) 80%, transparent);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid var(--hairline);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .home .home-brand {
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        white-space: nowrap;
+      }
+
+      .home .home-main {
+        flex: 1 0 auto;
+        display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 100vh;
-        padding: 1.5rem;
       }
 
       .home .home-card {
-        width: 36rem;
+        width: 38rem;
         max-width: 100%;
         padding: var(--space-12) var(--space-8);
         border-radius: 16px;
@@ -221,12 +259,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
       }
 
-      /* The shared <Nav> sits at the top of the card */
-      .home .home-card .nav {
-        justify-content: center;
-        margin-bottom: var(--space-8);
-        padding-bottom: var(--space-6);
-        border-bottom: 1px solid var(--hairline);
+      @media (max-width: 640px) {
+        .home .home-header {
+          flex-direction: column;
+          gap: var(--space-2);
+          border-radius: 18px;
+        }
+        .home .home-card {
+          padding: var(--space-8) var(--space-6);
+        }
       }
 
       /* Floating bg controls (bottom-right) */
