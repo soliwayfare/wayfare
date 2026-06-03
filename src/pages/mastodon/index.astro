@@ -1,0 +1,218 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { MASTODON } from '../../consts';
+
+const profileUrl = `https://${MASTODON.instance}/@${MASTODON.handle}`;
+---
+
+<BaseLayout title="Mastodon" description="嘟文 · 来自 Mastodon 的近期动态">
+  <h1 class="page-title">Mastodon</h1>
+  <p class="masto-intro">
+    来自 <a href={profileUrl} target="_blank" rel="me noopener">@{MASTODON.handle}@{MASTODON.instance}</a> 的近期嘟文，实时获取。
+  </p>
+
+  <div
+    id="masto-feed"
+    class="masto-feed"
+    data-instance={MASTODON.instance}
+    data-handle={MASTODON.handle}
+  >
+    <p class="masto-status">加载中…</p>
+  </div>
+</BaseLayout>
+
+<script>
+  // Recent toots are fetched client-side from the Mastodon REST API. Public
+  // statuses need no auth, so this works straight from the browser.
+  const dateFmt = new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  function el(tag: string, className?: string): HTMLElement {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    return node;
+  }
+
+  function renderMedia(attachments: any[]): HTMLElement | null {
+    const visual = attachments
+      .filter((a) => a.type === 'image' || a.type === 'gifv' || a.type === 'video')
+      .slice(0, 4); // Twitter/Mastodon show at most 4 in the inline gallery
+    if (!visual.length) return null;
+
+    const grid = el('div', 'masto-media');
+    grid.classList.add(`masto-media--n${visual.length}`);
+    if (visual.length > 1) grid.classList.add('masto-media--grid');
+
+    for (const a of visual) {
+      const link = el('a') as HTMLAnchorElement;
+      link.href = a.url || a.remote_url;
+      link.target = '_blank';
+      link.rel = 'noopener';
+
+      if (a.type === 'image') {
+        const img = el('img') as HTMLImageElement;
+        img.src = a.preview_url || a.url;
+        img.alt = a.description || '';
+        img.loading = 'lazy';
+        link.appendChild(img);
+      } else {
+        const video = el('video') as HTMLVideoElement;
+        video.src = a.url;
+        video.controls = true;
+        if (a.preview_url) video.poster = a.preview_url;
+        // Anchor wrapping is pointless for a video control; replace it.
+        grid.appendChild(video);
+        continue;
+      }
+      grid.appendChild(link);
+    }
+    return grid;
+  }
+
+  function renderCard(card: any): HTMLElement | null {
+    if (!card || !card.url) return null;
+    const a = el('a', 'masto-card') as HTMLAnchorElement;
+    a.href = card.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+
+    if (card.image) {
+      const img = el('img', 'masto-card-img') as HTMLImageElement;
+      img.src = card.image;
+      img.alt = '';
+      img.loading = 'lazy';
+      a.appendChild(img);
+    }
+    const body = el('div', 'masto-card-body');
+    const title = el('strong', 'masto-card-title');
+    title.textContent = card.title || card.url;
+    body.appendChild(title);
+    if (card.description) {
+      const desc = el('span', 'masto-card-desc');
+      desc.textContent = card.description;
+      body.appendChild(desc);
+    }
+    const host = el('span', 'masto-card-host');
+    try {
+      host.textContent = new URL(card.url).hostname;
+    } catch {
+      host.textContent = card.provider_name || '';
+    }
+    body.appendChild(host);
+    a.appendChild(body);
+    return a;
+  }
+
+  function renderToot(status: any): HTMLElement {
+    // A boost (reblog) carries its real content in `status.reblog`.
+    const boosted = status.reblog;
+    const s = boosted || status;
+
+    const article = el('article', 'masto-toot');
+
+    // Timeline node header: the date, linking to the original toot.
+    const head = el('a', 'masto-time') as HTMLAnchorElement;
+    head.href = s.url || status.url;
+    head.target = '_blank';
+    head.rel = 'noopener';
+    const time = el('time');
+    time.dateTime = s.created_at;
+    time.textContent = dateFmt.format(new Date(s.created_at));
+    head.appendChild(time);
+    article.appendChild(head);
+
+    if (boosted) {
+      const tag = el('span', 'masto-boost');
+      tag.textContent = `🔁 转发 @${s.account.acct}`;
+      article.appendChild(tag);
+    }
+
+    const content = el('div', 'masto-content post-content');
+    // `content` is server-sanitized HTML from the Mastodon API.
+    content.innerHTML = s.content;
+    // Open in-content links in a new tab.
+    content.querySelectorAll('a').forEach((a) => {
+      a.target = '_blank';
+      a.rel = 'noopener';
+    });
+    article.appendChild(content);
+
+    const media = renderMedia(s.media_attachments || []);
+    if (media) article.appendChild(media);
+    else {
+      const card = renderCard(s.card);
+      if (card) article.appendChild(card);
+    }
+
+    if (s.favourites_count || s.reblogs_count) {
+      const stats = el('div', 'masto-stats');
+      if (s.favourites_count) {
+        const fav = el('span', 'masto-stat');
+        fav.textContent = `★ ${s.favourites_count}`;
+        stats.appendChild(fav);
+      }
+      if (s.reblogs_count) {
+        const rb = el('span', 'masto-stat');
+        rb.textContent = `🔁 ${s.reblogs_count}`;
+        stats.appendChild(rb);
+      }
+      article.appendChild(stats);
+    }
+
+    return article;
+  }
+
+  async function loadMastodon() {
+    const root = document.getElementById('masto-feed');
+    if (!root || root.dataset.loaded === 'true') return;
+    root.dataset.loaded = 'true';
+
+    const { instance, handle } = root.dataset as { instance: string; handle: string };
+    const base = `https://${instance}/api/v1`;
+
+    try {
+      const acct = await fetch(
+        `${base}/accounts/lookup?acct=${encodeURIComponent(handle)}`,
+      ).then((r) => {
+        if (!r.ok) throw new Error(`lookup ${r.status}`);
+        return r.json();
+      });
+
+      const statuses = await fetch(
+        `${base}/accounts/${acct.id}/statuses?limit=20&exclude_replies=true`,
+      ).then((r) => {
+        if (!r.ok) throw new Error(`statuses ${r.status}`);
+        return r.json();
+      });
+
+      root.textContent = '';
+      if (!statuses.length) {
+        const empty = el('p', 'masto-status');
+        empty.textContent = '还没有嘟文。';
+        root.appendChild(empty);
+        return;
+      }
+      for (const status of statuses) root.appendChild(renderToot(status));
+    } catch (err) {
+      root.dataset.loaded = 'false';
+      root.textContent = '';
+      const msg = el('p', 'masto-status');
+      const link = el('a') as HTMLAnchorElement;
+      link.href = `https://${instance}/@${handle}`;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = `在 ${instance} 上查看 →`;
+      msg.append('嘟文加载失败。', link);
+      root.appendChild(msg);
+      console.error('[mastodon]', err);
+    }
+  }
+
+  // Runs on first load and after every <ClientRouter /> navigation.
+  document.addEventListener('astro:page-load', loadMastodon);
+</script>

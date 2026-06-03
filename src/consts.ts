@@ -12,6 +12,13 @@ export const SITE = {
 // Disqus comment thread shortname.
 export const DISQUS_SHORTNAME = 'cnwangjie';
 
+// Mastodon account embedded on the /mastodon/ page. Public statuses are fetched
+// client-side from the instance's REST API, so no access token is needed.
+export const MASTODON = {
+  instance: 'c.im',
+  handle: 'wangjie',
+} as const;
+
 // Google Analytics (Universal Analytics) tracking id.
 export const GA_ID = 'UA-65598064-1';
 
@@ -23,5 +30,6 @@ export const NAV: { label: string; href: string; external?: boolean }[] = [
   { label: 'HOME', href: 'https://www.cnwangjie.com/', external: true },
   { label: 'BLOG', href: '/' },
   { label: 'ARCHIVE', href: '/archives/' },
+  { label: 'MASTODON', href: '/mastodon/' },
   { label: 'RSS', href: '/atom.xml' },
 ];
