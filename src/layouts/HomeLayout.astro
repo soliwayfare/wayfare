@@ -124,7 +124,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         margin: 0;
       }
 
-      /* Rotating background layers */
+      /* Rotating background layers. The .bg sits at z-index:0 (a positioned
+         element, so it paints *over* the body's opaque background) and the page
+         content is lifted to z-index:1 above it. This avoids the negative
+         z-index trick, which gets hidden behind the body background and behaves
+         inconsistently across view-transition stacking contexts. */
       .home .bg {
         transition: opacity 4s ease-in-out;
         position: fixed;
@@ -133,18 +137,18 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
         background-size: 400% 400%;
         animation: home-gradient 15s ease infinite;
-        z-index: -1;
+        z-index: 0;
       }
 
       .home .bg .cur {
-        position: fixed;
+        position: absolute;
         inset: 0;
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;
         animation: home-fadein 1s;
-        z-index: 0;
       }
+
 
       @keyframes home-fadein {
         0% { opacity: 0; }
@@ -194,8 +198,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         60%, 100% { left: 107%; right: -8%; }
       }
 
-      /* Layout shell */
+      /* Layout shell — lifted above the fixed background (z-index:0) */
       .home .home-wrap {
+        position: relative;
+        z-index: 1;
         display: flex;
         align-items: center;
         justify-content: center;
