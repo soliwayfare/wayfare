@@ -4,6 +4,7 @@ import { SITE } from '../consts';
 import { withBase } from '../utils/url';
 import Nav from '../components/Nav.astro';
 import NavLoader from '../components/NavLoader.astro';
+import SiteBackground from '../components/SiteBackground.astro';
 import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import '../styles/global.css';
 
@@ -36,7 +37,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   </head>
   <body>
     <NavLoader />
+    <SiteBackground />
     <div class="wrap">
+      <div class="page-surface" transition:name="surface" aria-hidden="true"></div>
       <header class="site-header">
         <a class="logo-link" href={withBase('/')}>
           <h1>{SITE.title}</h1>
@@ -46,7 +49,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       <main class="container">
         <slot />
       </main>
-      <footer class="site-footer" transition:persist>
+      <footer class="site-footer">
         <p>
           © {copyrightYears}
           <a href="/">{SITE.author}</a>, powered by{' '}

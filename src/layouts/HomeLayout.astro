@@ -3,6 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../consts';
 import Nav from '../components/Nav.astro';
 import NavLoader from '../components/NavLoader.astro';
+import SiteBackground from '../components/SiteBackground.astro';
 import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import '../styles/global.css';
 
@@ -32,9 +33,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   </head>
   <body class="home">
     <NavLoader />
+    <SiteBackground />
     <div class="home-wrap">
       <header class="home-header">
-        <div class="masthead-glass" transition:name="masthead-glass" aria-hidden="true"></div>
+        <div class="masthead-glass" transition:name="surface" aria-hidden="true"></div>
         <a class="home-brand" href="/">{SITE.author}</a>
         <Nav />
       </header>
@@ -43,165 +45,26 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       </main>
     </div>
 
-    <div class="bg-controls">
-      <button class="bg-btn" id="bg-pause" title="Pause" aria-label="Pause background">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-          <rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" />
-        </svg>
-      </button>
-      <button class="bg-btn" id="bg-save" title="Save image" aria-label="Save background image">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-      </button>
-    </div>
-
     <GoogleAnalytics />
 
     <script>
-      import { dynamicBackground, type BgControls } from '../scripts/dynamic-background';
-
-      const PAUSE_ICON =
-        '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
-      const PLAY_ICON =
-        '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 5.5v13a1 1 0 0 0 1.52.85l10.5-6.5a1 1 0 0 0 0-1.7L8.52 4.65A1 1 0 0 0 7 5.5z"/></svg>';
-
-      let controls: BgControls | undefined;
-      let started = false;
-
+      // Decode the obfuscated email in the home card. The rotating background and
+      // its controls now live in <SiteBackground /> (site-wide, persisted).
       function decodeEmail() {
         const mail = document.querySelector('#code');
         if (mail) mail.textContent = atob('aUBpOGUubmV0');
       }
-
-      function setupControls() {
-        if (!controls) return;
-        const pauseBtn = document.querySelector<HTMLButtonElement>('#bg-pause');
-        const saveBtn = document.querySelector<HTMLButtonElement>('#bg-save');
-        if (!pauseBtn || !saveBtn) return;
-        let paused = false;
-
-        pauseBtn.addEventListener('click', () => {
-          if (!controls) return;
-          paused = !paused;
-          if (paused) {
-            controls.pause();
-            pauseBtn.innerHTML = PLAY_ICON;
-            pauseBtn.title = 'Resume';
-          } else {
-            controls.resume();
-            pauseBtn.innerHTML = PAUSE_ICON;
-            pauseBtn.title = 'Pause';
-          }
-        });
-
-        saveBtn.addEventListener('click', () => controls?.saveCurrentImage());
-      }
-
-      function start() {
-        if (started || location.pathname !== '/') return;
-        started = true;
-        decodeEmail();
-        controls = dynamicBackground();
-        setupControls();
-      }
-
-      function stop() {
-        controls?.destroy();
-        controls = undefined;
-        started = false;
-      }
-
-      // ClientRouter executes this module once, then fires astro:page-load on
-      // every navigation (incl. the first). Set up on entering the homepage and
-      // tear down before leaving so the bg timers/listeners never leak.
-      document.addEventListener('astro:page-load', start);
-      document.addEventListener('astro:before-swap', stop);
+      document.addEventListener('astro:page-load', decodeEmail);
     </script>
 
     <style is:global>
-      /* Homepage-only styles, scoped to `body.home` so nothing leaks onto the
-         blog. The .bg / progress-indicator elements are injected by the bg
-         script at runtime, so they must live in a global (not Astro-scoped)
-         block to be matched. */
+      /* Homepage-only layout, scoped to `body.home`. The rotating background
+         (.bg), progress indicator and bg controls are site-wide now and live in
+         global.css (rendered by <SiteBackground />). */
 
       body.home {
         min-height: 100vh;
         margin: 0;
-      }
-
-      /* Rotating background layers. The .bg sits at z-index:0 (a positioned
-         element, so it paints *over* the body's opaque background) and the page
-         content is lifted to z-index:1 above it. This avoids the negative
-         z-index trick, which gets hidden behind the body background and behaves
-         inconsistently across view-transition stacking contexts. */
-      .home .bg {
-        transition: opacity 4s ease-in-out;
-        position: fixed;
-        inset: 0;
-        opacity: 1;
-        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-        background-size: 400% 400%;
-        animation: home-gradient 15s ease infinite;
-        z-index: 0;
-      }
-
-      .home .bg .cur {
-        position: absolute;
-        inset: 0;
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center;
-        animation: home-fadein 1s;
-      }
-
-
-      @keyframes home-fadein {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
-      }
-
-      @keyframes home-gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-      }
-
-      /* Indeterminate + determinate progress bar */
-      .home .progress-indicator-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: var(--accent-soft);
-        z-index: 10;
-      }
-
-      .home .progress-indicator {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        top: 0;
-        background: var(--accent);
-        transition: all 0.1s linear;
-        transform-origin: left;
-      }
-
-      .home .anim-1 {
-        animation: home-indicator-1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
-      }
-      .home .anim-2 {
-        animation: home-indicator-2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite;
-      }
-
-      @keyframes home-indicator-1 {
-        0% { left: -35%; right: 100%; }
-        50%, 100% { left: 100%; right: -90%; }
-      }
-      @keyframes home-indicator-2 {
-        0% { left: -200%; right: 100%; }
-        60%, 100% { left: 107%; right: -8%; }
       }
 
       /* Layout shell — lifted above the fixed background (z-index:0) */
@@ -232,16 +95,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         padding: 0.7rem 1.4rem;
       }
 
-      /* The glass background of the home nav, behind the brand + nav. It carries
-         a slight ink tint (not pure paper) so that, when it expands to fill the
-         screen on navigation, the frosted panel is clearly visible even over the
-         near-white blog pages — otherwise it would be white-on-white. */
+      /* The glass background of the home nav, behind the brand + nav. It shares
+         transition:name="surface" with the blog's .page-surface, so on leaving
+         the homepage this pill morphs (grows + thickens from frosted to nearly
+         opaque) into the inner page's reading panel over the same photo. */
       .home .masthead-glass {
         position: absolute;
         inset: 0;
         z-index: 0;
         border-radius: 999px;
-        background: color-mix(in srgb, var(--ink) 9%, color-mix(in srgb, var(--paper) 78%, transparent));
+        background: color-mix(in srgb, var(--paper) 80%, transparent);
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
         border: 1px solid var(--hairline);
@@ -293,44 +156,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         .home .home-card {
           padding: var(--space-8) var(--space-6);
         }
-      }
-
-      /* Floating bg controls (bottom-right) */
-      .home .bg-controls {
-        position: fixed;
-        bottom: 1.5rem;
-        right: 1.5rem;
-        display: flex;
-        gap: var(--space-2);
-        z-index: 10;
-      }
-
-      .home .bg-btn {
-        width: 40px;
-        height: 40px;
-        border: 1px solid var(--hairline);
-        border-radius: 12px;
-        background: color-mix(in srgb, var(--paper) 70%, transparent);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        color: var(--ink-soft);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: color var(--dur) var(--ease), transform var(--dur) var(--ease),
-          box-shadow var(--dur) var(--ease);
-      }
-
-      .home .bg-btn:hover {
-        color: var(--ink);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
-      }
-
-      .home .bg-btn:active {
-        transform: translateY(0);
       }
     </style>
   </body>

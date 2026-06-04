@@ -59,6 +59,10 @@ const getNextImage = () =>
   preFetchQueue.length ? preFetchQueue.shift() : fetchRandomImage();
 
 const injectBackground = () => {
+  // Reuse the persisted .bg declared by <SiteBackground /> if present, so the
+  // current image survives navigation; otherwise create one (defensive).
+  const existing = document.querySelector<HTMLDivElement>('.bg');
+  if (existing) return existing;
   const bg = document.createElement('div');
   bg.className = 'bg';
   document.body.appendChild(bg);
@@ -66,9 +70,15 @@ const injectBackground = () => {
 };
 
 const createBgIndicator = () => {
-  const container = document.createElement('div');
-  container.className = 'progress-indicator-container';
-  document.body.appendChild(container);
+  // Reuse the persisted container if present; append the indicator children.
+  let container = document.querySelector<HTMLDivElement>(
+    '.progress-indicator-container',
+  );
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'progress-indicator-container';
+    document.body.appendChild(container);
+  }
   const indicator1 = document.createElement('div');
   indicator1.className = 'progress-indicator anim-1';
   container.appendChild(indicator1);

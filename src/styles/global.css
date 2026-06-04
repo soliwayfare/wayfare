@@ -116,10 +116,38 @@ img {
 }
 
 /* ---------- Layout shell ---------- */
+/* Inner pages are a centered "document" column floating on the shared photo
+   background: .wrap is the column (above the .bg), .page-surface is the
+   near-opaque frosted sheet behind its content, and the photo shows in the
+   margins on either side. .page-surface also carries the "surface" view
+   transition, so the home nav glass morphs into it on navigation. */
 .wrap {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.page-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-left: 1px solid var(--hairline);
+  border-right: 1px solid var(--hairline);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+}
+
+.wrap > .site-header,
+.wrap > .container,
+.wrap > .site-footer {
+  position: relative;
+  z-index: 1;
 }
 
 .container {
@@ -128,6 +156,125 @@ img {
   margin: 0 auto;
   padding: 0 1.5rem;
   flex: 1 0 auto;
+}
+
+@media (max-width: 56rem) {
+  /* Below the column width the panel goes full-bleed; drop the side borders. */
+  .page-surface {
+    border-left: none;
+    border-right: none;
+  }
+}
+
+/* ---------- Site background (rotating photo, shared across all pages) ---------- */
+/* The .bg sits at z-index:0 — a positioned element, so it paints *over* the
+   body's opaque paper background — and page content is lifted above it. Rendered
+   and driven by <SiteBackground />; persisted across navigations so the image is
+   continuous. */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 1;
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: bg-gradient 15s ease infinite;
+  transition: opacity 4s ease-in-out;
+}
+
+.bg .cur {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  animation: bg-fadein 1s;
+}
+
+@keyframes bg-fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes bg-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Indeterminate + determinate image-loading progress bar (top of viewport) */
+.progress-indicator-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-soft);
+  z-index: 10;
+}
+
+.progress-indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  top: 0;
+  background: var(--accent);
+  transition: all 0.1s linear;
+  transform-origin: left;
+}
+
+.anim-1 {
+  animation: bg-indicator-1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+}
+.anim-2 {
+  animation: bg-indicator-2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite;
+}
+
+@keyframes bg-indicator-1 {
+  0% { left: -35%; right: 100%; }
+  50%, 100% { left: 100%; right: -90%; }
+}
+@keyframes bg-indicator-2 {
+  0% { left: -200%; right: 100%; }
+  60%, 100% { left: 107%; right: -8%; }
+}
+
+/* Floating background controls (bottom-right): pause/resume + save image */
+.bg-controls {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: var(--space-2);
+  z-index: 10;
+}
+
+.bg-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.bg-btn:hover {
+  color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+}
+
+.bg-btn:active {
+  transform: translateY(0);
 }
 
 /* ---------- Header ---------- */
@@ -902,37 +1049,25 @@ a {
    navigation + fade). Astro injects the transition styles and disables them
    under prefers-reduced-motion automatically. */
 
-/* The homepage nav has a glass background (.masthead-glass) carrying its own
-   transition name. Only the homepage has this element, so on navigation it is
-   "old only" (leaving home) or "new only" (entering home). We override the
-   default fade: leaving home, the glass scales up from its pill to cover the
-   whole screen and dissolves; entering home, it settles back down. The scale
-   origin is near the top, where the bar sits, so it expands outward from there. */
-::view-transition-old(masthead-glass) {
-  animation: masthead-glass-expand 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  transform-origin: center top;
+/* Shared "surface" morph: the homepage nav glass (.masthead-glass, a small
+   frosted pill) and the inner pages' reading panel (.page-surface, a tall
+   near-opaque sheet) carry the same transition name. On leaving home the pill
+   grows into the full panel while its snapshot cross-fades from translucent to
+   nearly opaque — reading as "the nav glass enlarges and becomes solid". The
+   reverse plays when returning home. Both sit over the same persisted photo
+   background, so the morph happens against a continuous backdrop. */
+::view-transition-group(surface) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
-/* The glass is a flat translucent fill, so a non-uniform scale (wide × very
-   tall, anchored at the top where the bar sits) cleanly grows it to cover the
-   whole viewport; it then holds for a beat and dissolves to reveal the page.
-   Entering home uses the default fade-in (no rule needed). */
-@keyframes masthead-glass-expand {
-  0% {
-    transform: scale(1, 1);
-    opacity: 1;
-  }
-  60% {
-    transform: scale(8, 55);
-    opacity: 1;
-  }
-  75% {
-    transform: scale(8, 55);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(8, 55);
-    opacity: 0;
-  }
+::view-transition-old(surface),
+::view-transition-new(surface) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Stretch each snapshot to fill the morphing box so the frosted fill grows
+     cleanly instead of being letterboxed at its original aspect ratio. */
+  height: 100%;
+  object-fit: fill;
 }
 
 /* ---------- Motion preferences ---------- */

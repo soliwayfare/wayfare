@@ -1,0 +1,64 @@
+---
+// Site-wide rotating photo background, shared across every page. The elements
+// are persisted across navigations (transition:persist) so the SAME image stays
+// in place as you move between pages — that continuity is what lets the home
+// nav glass expand over a stable backdrop. The rotation loop is started once per
+// session: <ClientRouter /> keeps the same window, so the timers in the script's
+// closure survive navigation and must not be re-initialised or torn down.
+---
+
+<div class="bg" transition:persist="site-bg"></div>
+<div class="progress-indicator-container" transition:persist="site-bg-progress"></div>
+
+<div class="bg-controls" transition:persist="site-bg-controls">
+  <button class="bg-btn" id="bg-pause" title="Pause" aria-label="Pause background">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+      <rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" />
+    </svg>
+  </button>
+  <button class="bg-btn" id="bg-save" title="Save image" aria-label="Save background image">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  </button>
+</div>
+
+<script>
+  import { dynamicBackground, type BgControls } from '../scripts/dynamic-background';
+
+  const PAUSE_ICON =
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+  const PLAY_ICON =
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 5.5v13a1 1 0 0 0 1.52.85l10.5-6.5a1 1 0 0 0 0-1.7L8.52 4.65A1 1 0 0 0 7 5.5z"/></svg>';
+
+  const w = window as any;
+
+  // Start the rotation exactly once for the whole session. The elements above
+  // are persisted, so on later navigations they (and this running loop) are
+  // already in place — re-initialising would spawn duplicate timers.
+  if (!w.__bgStarted) {
+    w.__bgStarted = true;
+    const controls: BgControls | undefined = dynamicBackground();
+    w.__bgControls = controls;
+
+    const pauseBtn = document.querySelector<HTMLButtonElement>('#bg-pause');
+    const saveBtn = document.querySelector<HTMLButtonElement>('#bg-save');
+    let paused = false;
+
+    pauseBtn?.addEventListener('click', () => {
+      if (!controls) return;
+      paused = !paused;
+      if (paused) {
+        controls.pause();
+        pauseBtn.innerHTML = PLAY_ICON;
+        pauseBtn.title = 'Resume';
+      } else {
+        controls.resume();
+        pauseBtn.innerHTML = PAUSE_ICON;
+        pauseBtn.title = 'Pause';
+      }
+    });
+
+    saveBtn?.addEventListener('click', () => controls?.saveCurrentImage());
+  }
+</script>
