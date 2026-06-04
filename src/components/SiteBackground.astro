@@ -7,10 +7,10 @@
 // closure survive navigation and must not be re-initialised or torn down.
 ---
 
-<div class="bg" transition:persist="site-bg"></div>
-<div class="progress-indicator-container" transition:persist="site-bg-progress"></div>
+<div class="bg" transition:name="site-bg" transition:persist="site-bg"></div>
+<div class="progress-indicator-container" transition:name="site-bg-progress" transition:persist="site-bg-progress"></div>
 
-<div class="bg-controls" transition:persist="site-bg-controls">
+<div class="bg-controls" transition:name="site-bg-controls" transition:persist="site-bg-controls">
   <button class="bg-btn" id="bg-pause" title="Pause" aria-label="Pause background">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
       <rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" />

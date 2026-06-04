@@ -1060,6 +1060,28 @@ a {
   animation-duration: 0.55s;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* The persisted background, progress bar and controls are their own stable
+   layers: hold them perfectly still (no fade/scale) through every transition,
+   and only paint the current copy, so the photo and the bottom-right buttons
+   never flicker, fade, or jump position mid-navigation. */
+::view-transition-group(site-bg),
+::view-transition-group(site-bg-progress),
+::view-transition-group(site-bg-controls),
+::view-transition-old(site-bg),
+::view-transition-new(site-bg),
+::view-transition-old(site-bg-progress),
+::view-transition-new(site-bg-progress),
+::view-transition-old(site-bg-controls),
+::view-transition-new(site-bg-controls) {
+  animation: none !important;
+}
+::view-transition-old(site-bg),
+::view-transition-old(site-bg-progress),
+::view-transition-old(site-bg-controls) {
+  display: none;
+}
+
 ::view-transition-old(surface),
 ::view-transition-new(surface) {
   animation-duration: 0.55s;
