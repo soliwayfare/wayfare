@@ -2,7 +2,6 @@
 import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../consts';
 import Nav from '../components/Nav.astro';
-import NavLoader from '../components/NavLoader.astro';
 import SiteBackground from '../components/SiteBackground.astro';
 import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import '../styles/global.css';
@@ -32,7 +31,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <ClientRouter />
   </head>
   <body class="home">
-    <NavLoader />
     <SiteBackground />
     <div class="home-wrap">
       <header class="home-header">

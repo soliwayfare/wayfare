@@ -1050,12 +1050,13 @@ a {
    under prefers-reduced-motion automatically. */
 
 /* Shared "surface" morph: the homepage nav glass (.masthead-glass, a small
-   frosted pill) and the inner pages' reading panel (.page-surface, a tall
-   near-opaque sheet) carry the same transition name. On leaving home the pill
-   grows into the full panel while its snapshot cross-fades from translucent to
-   nearly opaque — reading as "the nav glass enlarges and becomes solid". The
-   reverse plays when returning home. Both sit over the same persisted photo
-   background, so the morph happens against a continuous backdrop. */
+   frosted pill) and the inner pages' whole content column (.wrap, a tall
+   near-opaque sheet with its content) carry the same transition name. On
+   leaving home the pill grows into the full panel and the page content
+   cross-fades in *as part of* the morph (so nothing pops in afterwards),
+   reading as "the nav glass enlarges and becomes the page". The reverse plays
+   when returning home. Both sit over the same persisted photo background, so
+   the morph happens against a continuous backdrop. */
 ::view-transition-group(surface) {
   animation-duration: 0.55s;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -1086,10 +1087,6 @@ a {
 ::view-transition-new(surface) {
   animation-duration: 0.55s;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  /* Stretch each snapshot to fill the morphing box so the frosted fill grows
-     cleanly instead of being letterboxed at its original aspect ratio. */
-  height: 100%;
-  object-fit: fill;
 }
 
 /* ---------- Motion preferences ---------- */

@@ -3,7 +3,6 @@ import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../consts';
 import { withBase } from '../utils/url';
 import Nav from '../components/Nav.astro';
-import NavLoader from '../components/NavLoader.astro';
 import SiteBackground from '../components/SiteBackground.astro';
 import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import '../styles/global.css';
@@ -36,10 +35,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <ClientRouter />
   </head>
   <body>
-    <NavLoader />
     <SiteBackground />
-    <div class="wrap">
-      <div class="page-surface" transition:name="surface" aria-hidden="true"></div>
+    <div class="wrap" transition:name="surface">
+      <div class="page-surface" aria-hidden="true"></div>
       <header class="site-header">
         <a class="logo-link" href={withBase('/')}>
           <h1>{SITE.title}</h1>
