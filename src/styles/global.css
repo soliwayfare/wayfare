@@ -202,51 +202,74 @@ img {
   100% { background-position: 0% 50%; }
 }
 
-/* Indeterminate + determinate image-loading progress bar (top of viewport) */
-.progress-indicator-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--accent-soft);
-  z-index: 10;
-}
-
-.progress-indicator {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  top: 0;
-  background: var(--accent);
-  transition: all 0.1s linear;
-  transform-origin: left;
-}
-
-.anim-1 {
-  animation: bg-indicator-1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
-}
-.anim-2 {
-  animation: bg-indicator-2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite;
-}
-
-@keyframes bg-indicator-1 {
-  0% { left: -35%; right: 100%; }
-  50%, 100% { left: 100%; right: -90%; }
-}
-@keyframes bg-indicator-2 {
-  0% { left: -200%; right: 100%; }
-  60%, 100% { left: 107%; right: -8%; }
-}
-
-/* Floating background controls (bottom-right): pause/resume + save image */
+/* Floating background controls (bottom-right): a pause/resume FAB that doubles
+   as the rotation progress ring, plus a smaller save-image button. */
 .bg-controls {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
   display: flex;
+  align-items: center;
   gap: var(--space-2);
   z-index: 10;
+}
+
+/* Pause/resume FAB with a circular progress ring around it. */
+.bg-fab {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.bg-fab:hover {
+  color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+}
+
+.bg-fab:active {
+  transform: translateY(0);
+}
+
+/* The ring sits on top of the FAB; rotate so progress grows clockwise from 12. */
+.bg-fab-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.bg-fab-track {
+  stroke: color-mix(in srgb, var(--ink) 14%, transparent);
+  stroke-width: 2.5;
+}
+
+.bg-fab-progress {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.bg-fab-icon {
+  display: flex;
+  position: relative;
 }
 
 .bg-btn {
@@ -1062,23 +1085,19 @@ a {
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* The persisted background, progress bar and controls are their own stable
-   layers: hold them perfectly still (no fade/scale) through every transition,
-   and only paint the current copy, so the photo and the bottom-right buttons
-   never flicker, fade, or jump position mid-navigation. */
+/* The persisted background and controls are their own stable layers: hold them
+   perfectly still (no fade/scale) through every transition, and only paint the
+   current copy, so the photo and the bottom-right FAB never flicker, fade, or
+   jump position mid-navigation. */
 ::view-transition-group(site-bg),
-::view-transition-group(site-bg-progress),
 ::view-transition-group(site-bg-controls),
 ::view-transition-old(site-bg),
 ::view-transition-new(site-bg),
-::view-transition-old(site-bg-progress),
-::view-transition-new(site-bg-progress),
 ::view-transition-old(site-bg-controls),
 ::view-transition-new(site-bg-controls) {
   animation: none !important;
 }
 ::view-transition-old(site-bg),
-::view-transition-old(site-bg-progress),
 ::view-transition-old(site-bg-controls) {
   display: none;
 }

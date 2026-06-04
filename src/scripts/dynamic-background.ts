@@ -69,38 +69,6 @@ const injectBackground = () => {
   return bg;
 };
 
-const createBgIndicator = () => {
-  // Reuse the persisted container if present; append the indicator children.
-  let container = document.querySelector<HTMLDivElement>(
-    '.progress-indicator-container',
-  );
-  if (!container) {
-    container = document.createElement('div');
-    container.className = 'progress-indicator-container';
-    document.body.appendChild(container);
-  }
-  const indicator1 = document.createElement('div');
-  indicator1.className = 'progress-indicator anim-1';
-  container.appendChild(indicator1);
-  const indicator2 = document.createElement('div');
-  indicator2.className = 'progress-indicator anim-2';
-  container.appendChild(indicator2);
-  const indicator = document.createElement('div');
-  indicator.className = 'progress-indicator';
-  container.appendChild(indicator);
-  let removed = false;
-  return {
-    container,
-    indicator,
-    removeIndeterminate() {
-      if (removed) return;
-      removed = true;
-      container.removeChild(indicator1);
-      container.removeChild(indicator2);
-    },
-  };
-};
-
 const FADE_DURATION = 1000;
 
 let currentImageUrl: string | null = null;
@@ -131,8 +99,15 @@ export interface BgControls {
 }
 
 export const dynamicBackground = (): BgControls | undefined => {
-  const { container, indicator, removeIndeterminate } = createBgIndicator();
   const bg = injectBackground();
+
+  // Drive the FAB's circular progress ring (rendered by <SiteBackground />).
+  const ring = document.querySelector<SVGCircleElement>('.bg-fab-progress');
+  const ringC = ring ? 2 * Math.PI * ring.r.baseVal.value : 0;
+  if (ring) ring.style.strokeDasharray = String(ringC);
+  const setProgress = (p: number) => {
+    if (ring) ring.style.strokeDashoffset = String(ringC * (1 - Math.min(1, Math.max(0, p))));
+  };
 
   if (~location.hash.indexOf('pure')) {
     // Pure mode: no rotation, but still expose a destroy() so the caller can
@@ -143,54 +118,50 @@ export const dynamicBackground = (): BgControls | undefined => {
       saveCurrentImage() {},
       destroy() {
         bg.remove();
-        container.remove();
       },
     };
   }
 
-  let progress = 0;
-  let progressUpdateInterval: number;
   let paused = false;
-  let timeout: number;
+  let timeout = 0; // image-change timer
+  let raf = 0; // ring animation frame
+  let cycleStart = 0; // performance.now() when the current cycle began
+  let pausedElapsed = 0; // ms elapsed into the cycle when paused
 
-  const updateBgIndicator = () => {
-    indicator.style.width = ((progress * 100) << 0) + '%';
+  // The ring fills from real elapsed time, so it reaches 100% exactly when the
+  // image-change timeout fires — they share one clock and never drift apart.
+  const tickRing = () => {
+    raf = 0;
+    const elapsed = performance.now() - cycleStart;
+    setProgress(elapsed / loopIntervalMS);
+    if (!paused && elapsed < loopIntervalMS) raf = requestAnimationFrame(tickRing);
   };
-
-  const startProgressInterval = () => {
-    if (progressUpdateInterval) clearInterval(progressUpdateInterval);
-
-    progressUpdateInterval = setInterval(() => {
-      if (progress < 1) {
-        progress += 0.01;
-      }
-      updateBgIndicator();
-    }, loopIntervalMS / 100);
+  const startRing = () => {
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(tickRing);
   };
 
   const scheduleNext = (delayMS: number) => {
     if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(loop, delayMS);
+    timeout = window.setTimeout(loop, delayMS);
   };
 
-  const loop = async () => {
+  async function loop() {
     timeout = 0;
-
     await changeBackground(bg);
-    removeIndeterminate();
     preFetchImage();
-    progress = 0;
-    startProgressInterval();
-
-    if (timeout || paused) return;
-
+    cycleStart = performance.now();
+    setProgress(0);
+    startRing();
+    if (paused) return;
     scheduleNext(loopIntervalMS);
-  };
+  }
 
   const stopTimers = () => {
     if (timeout) clearTimeout(timeout);
     timeout = 0;
-    if (progressUpdateInterval) clearInterval(progressUpdateInterval);
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
   };
 
   const handleHidden = () => {
@@ -204,13 +175,14 @@ export const dynamicBackground = (): BgControls | undefined => {
   return {
     pause() {
       paused = true;
+      pausedElapsed = performance.now() - cycleStart;
       stopTimers();
     },
     resume() {
       paused = false;
-      const remainingMS = (1 - progress) * loopIntervalMS;
-      startProgressInterval();
-      scheduleNext(remainingMS);
+      cycleStart = performance.now() - pausedElapsed;
+      startRing();
+      scheduleNext(Math.max(0, loopIntervalMS - pausedElapsed));
     },
     saveCurrentImage() {
       if (!currentImageUrl) return;
@@ -223,7 +195,6 @@ export const dynamicBackground = (): BgControls | undefined => {
       stopTimers();
       document.removeEventListener('visibilitychange', handleHidden);
       bg.remove();
-      container.remove();
     },
   };
 };

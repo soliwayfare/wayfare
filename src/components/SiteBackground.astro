@@ -5,16 +5,25 @@
 // nav glass expand over a stable backdrop. The rotation loop is started once per
 // session: <ClientRouter /> keeps the same window, so the timers in the script's
 // closure survive navigation and must not be re-initialised or torn down.
+//
+// The rotation progress shows as a ring on the pause FAB (bottom-right) instead
+// of a top bar; the ring fills from real elapsed time so it lands exactly when
+// the image changes.
 ---
 
 <div class="bg" transition:name="site-bg" transition:persist="site-bg"></div>
-<div class="progress-indicator-container" transition:name="site-bg-progress" transition:persist="site-bg-progress"></div>
 
 <div class="bg-controls" transition:name="site-bg-controls" transition:persist="site-bg-controls">
-  <button class="bg-btn" id="bg-pause" title="Pause" aria-label="Pause background">
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-      <rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" />
+  <button class="bg-fab" id="bg-pause" title="Pause" aria-label="Pause background rotation">
+    <svg class="bg-fab-ring" viewBox="0 0 48 48" aria-hidden="true">
+      <circle class="bg-fab-track" cx="24" cy="24" r="21" fill="none" />
+      <circle class="bg-fab-progress" cx="24" cy="24" r="21" fill="none" />
     </svg>
+    <span class="bg-fab-icon">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+        <rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" />
+      </svg>
+    </span>
   </button>
   <button class="bg-btn" id="bg-save" title="Save image" aria-label="Save background image">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -27,9 +36,9 @@
   import { dynamicBackground, type BgControls } from '../scripts/dynamic-background';
 
   const PAUSE_ICON =
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
   const PLAY_ICON =
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 5.5v13a1 1 0 0 0 1.52.85l10.5-6.5a1 1 0 0 0 0-1.7L8.52 4.65A1 1 0 0 0 7 5.5z"/></svg>';
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M7 5.5v13a1 1 0 0 0 1.52.85l10.5-6.5a1 1 0 0 0 0-1.7L8.52 4.65A1 1 0 0 0 7 5.5z"/></svg>';
 
   const w = window as any;
 
@@ -42,19 +51,20 @@
     w.__bgControls = controls;
 
     const pauseBtn = document.querySelector<HTMLButtonElement>('#bg-pause');
+    const icon = pauseBtn?.querySelector<HTMLElement>('.bg-fab-icon');
     const saveBtn = document.querySelector<HTMLButtonElement>('#bg-save');
     let paused = false;
 
     pauseBtn?.addEventListener('click', () => {
-      if (!controls) return;
+      if (!controls || !icon) return;
       paused = !paused;
       if (paused) {
         controls.pause();
-        pauseBtn.innerHTML = PLAY_ICON;
+        icon.innerHTML = PLAY_ICON;
         pauseBtn.title = 'Resume';
       } else {
         controls.resume();
-        pauseBtn.innerHTML = PAUSE_ICON;
+        icon.innerHTML = PAUSE_ICON;
         pauseBtn.title = 'Pause';
       }
     });
