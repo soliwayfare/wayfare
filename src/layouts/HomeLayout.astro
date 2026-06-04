@@ -33,7 +33,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   <body class="home">
     <NavLoader />
     <div class="home-wrap">
-      <header class="home-header">
+      <header class="home-header" transition:name="masthead">
         <a class="home-brand" href="/">{SITE.author}</a>
         <Nav />
       </header>
