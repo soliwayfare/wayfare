@@ -899,9 +899,37 @@ a {
 }
 
 /* View transitions are handled by Astro's <ClientRouter /> (client-side
-   navigation + fade), with the header/footer persisted across navigations.
-   Astro injects the transition styles and disables them under
-   prefers-reduced-motion automatically. */
+   navigation + fade). Astro injects the transition styles and disables them
+   under prefers-reduced-motion automatically. */
+
+/* The homepage nav has a glass background (.masthead-glass) carrying its own
+   transition name. Only the homepage has this element, so on navigation it is
+   "old only" (leaving home) or "new only" (entering home). We override the
+   default fade: leaving home, the glass scales up from its pill to cover the
+   whole screen and dissolves; entering home, it settles back down. The scale
+   origin is near the top, where the bar sits, so it expands outward from there. */
+::view-transition-old(masthead-glass) {
+  animation: masthead-glass-expand 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: center top;
+}
+/* The glass is a flat translucent fill, so a non-uniform scale (wide × very
+   tall, anchored at the top where the bar sits) cleanly grows it to cover the
+   whole viewport; it then holds for a beat and dissolves to reveal the page.
+   Entering home uses the default fade-in (no rule needed). */
+@keyframes masthead-glass-expand {
+  0% {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(8, 55);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(8, 55);
+    opacity: 0;
+  }
+}
 
 /* ---------- Motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {

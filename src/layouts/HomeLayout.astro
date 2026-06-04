@@ -33,7 +33,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   <body class="home">
     <NavLoader />
     <div class="home-wrap">
-      <header class="home-header" transition:name="masthead">
+      <header class="home-header">
+        <div class="masthead-glass" transition:name="masthead-glass" aria-hidden="true"></div>
         <a class="home-brand" href="/">{SITE.author}</a>
         <Nav />
       </header>
@@ -215,8 +216,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       }
 
       /* Top header: brand left, shared <Nav> right — same structure as the blog
-         header, rendered as a readable glass bar floating over the photo. */
+         header. The readable glass bar lives in a separate .masthead-glass
+         layer so it can carry its own view transition (it grows to fill the
+         screen when leaving the homepage). The header itself is just layout. */
       .home .home-header {
+        position: relative;
         flex-shrink: 0;
         width: 100%;
         max-width: 44rem;
@@ -226,12 +230,26 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         justify-content: space-between;
         gap: var(--space-6);
         padding: 0.7rem 1.4rem;
+      }
+
+      /* The glass background of the home nav, behind the brand + nav. */
+      .home .masthead-glass {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
         border-radius: 999px;
         background: color-mix(in srgb, var(--paper) 80%, transparent);
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
         border: 1px solid var(--hairline);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Keep the brand + nav above the glass layer. */
+      .home .home-header > .home-brand,
+      .home .home-header > .nav {
+        position: relative;
+        z-index: 1;
       }
 
       .home .home-brand {
@@ -265,6 +283,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         .home .home-header {
           flex-direction: column;
           gap: var(--space-2);
+        }
+        .home .masthead-glass {
           border-radius: 18px;
         }
         .home .home-card {
