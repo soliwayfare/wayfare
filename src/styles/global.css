@@ -921,9 +921,13 @@ a {
     transform: scale(1, 1);
     opacity: 1;
   }
-  70% {
+  60% {
     transform: scale(8, 55);
-    opacity: 0.95;
+    opacity: 1;
+  }
+  75% {
+    transform: scale(8, 55);
+    opacity: 1;
   }
   100% {
     transform: scale(8, 55);

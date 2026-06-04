@@ -37,7 +37,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   <body>
     <NavLoader />
     <div class="wrap">
-      <header class="site-header" transition:name="masthead">
+      <header class="site-header">
         <a class="logo-link" href={withBase('/')}>
           <h1>{SITE.title}</h1>
         </a>
@@ -59,10 +59,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <script>
       import { DISQUS_SHORTNAME } from '../consts';
 
-      // The header morphs across navigations (transition:name="masthead") and
-      // is re-rendered each page, so build-time active state is usually right —
-      // but recompute on every load as a safeguard (and to cover the morph from
-      // the home layout). NAV data-path values are full site paths; compare exactly.
+      // The header is re-rendered on each navigation, so build-time active
+      // state is usually right — but recompute on every load as a safeguard.
+      // NAV data-path values are full site paths; compare exactly.
       function syncActiveNav() {
         const path = location.pathname;
         document.querySelectorAll<HTMLAnchorElement>('.nav a[data-path]').forEach((a) => {
