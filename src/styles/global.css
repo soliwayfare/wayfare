@@ -203,14 +203,19 @@ img {
 }
 
 /* Floating background controls (bottom-right): a pause/resume FAB that doubles
-   as the rotation progress ring, plus a smaller save-image button. */
+   as the rotation progress ring. The save-image button is a speed-dial action
+   that stays hidden and pops up above the FAB on hover/focus. column-reverse
+   keeps the FAB pinned at the bottom with the save button revealing above it;
+   the (reserved) space above the FAB keeps the hover target continuous so the
+   button doesn't vanish as the pointer travels up to it. */
 .bg-controls {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
   display: flex;
+  flex-direction: column-reverse;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   z-index: 10;
 }
 
@@ -272,32 +277,45 @@ img {
   position: relative;
 }
 
+/* Save-image speed-dial button: circular, hidden until the FAB is hovered. */
 .bg-btn {
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   color: var(--ink-soft);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease),
-    box-shadow var(--dur) var(--ease);
+  /* Hidden resting state — popped down/scaled into the FAB, not interactive. */
+  opacity: 0;
+  transform: translateY(12px) scale(0.8);
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease),
+    color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+/* Reveal on hover/focus of the whole control group (i.e. hovering the FAB). */
+.bg-controls:hover .bg-btn,
+.bg-controls:focus-within .bg-btn {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 .bg-btn:hover {
   color: var(--ink);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  transform: translateY(-1px) scale(1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
 }
 
 .bg-btn:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 /* ---------- Header ---------- */
