@@ -1,0 +1,109 @@
+---
+// Single source of truth for everything in <head> except <ClientRouter /> and
+// the <html lang> element (those stay in the layouts). Both BaseLayout and
+// HomeLayout render this so the metadata stays consistent.
+import { SITE, OG_IMAGE, SAME_AS } from '../consts';
+import { withBase } from '../utils/url';
+
+interface Props {
+  // Full document title, e.g. "Post · WangJie's blog".
+  pageTitle: string;
+  description: string;
+  canonical: string;
+  type?: 'website' | 'article';
+  image?: string;
+  // og:locale, e.g. "zh_CN" (blog) or "en_US" (home).
+  locale?: string;
+  // For type === 'article': the post title and publish date.
+  articleTitle?: string;
+  publishedDate?: Date;
+}
+
+const {
+  pageTitle,
+  description,
+  canonical,
+  type = 'website',
+  image = OG_IMAGE,
+  locale = 'zh_CN',
+  articleTitle,
+  publishedDate,
+} = Astro.props;
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : '';
+
+// schema.org graph: always a WebSite + Person; a BlogPosting is appended for
+// article pages. Serialized as a single JSON-LD block.
+const person = {
+  '@type': 'Person',
+  name: SITE.author,
+  url: `${siteUrl}/`,
+  sameAs: SAME_AS,
+};
+const graph: Record<string, unknown>[] = [
+  {
+    '@type': 'WebSite',
+    name: SITE.title,
+    description: SITE.description,
+    url: `${siteUrl}/`,
+    inLanguage: SITE.lang,
+    author: person,
+  },
+  person,
+];
+if (type === 'article') {
+  graph.push({
+    '@type': 'BlogPosting',
+    headline: articleTitle ?? pageTitle,
+    description,
+    url: canonical,
+    mainEntityOfPage: canonical,
+    inLanguage: SITE.lang,
+    image,
+    author: person,
+    ...(publishedDate ? { datePublished: publishedDate.toISOString() } : {}),
+  });
+}
+const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<meta name="author" content={SITE.author} />
+<link rel="canonical" href={canonical} />
+
+<!-- Icons, manifest, theme -->
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#fcfcfb" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#16181d" media="(prefers-color-scheme: dark)" />
+
+<!-- Feeds & sitemap -->
+<link rel="alternate" type="application/atom+xml" title={SITE.title} href={withBase('/atom.xml')} />
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+<!-- Open Graph -->
+<meta property="og:type" content={type} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content={SITE.title} />
+<meta property="og:image" content={image} />
+<meta property="og:locale" content={locale} />
+{type === 'article' && publishedDate && (
+  <meta property="article:published_time" content={publishedDate.toISOString()} />
+)}
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+
+<meta name="generator" content={Astro.generator} />
+
+<script type="application/ld+json" set:html={jsonLd} is:inline />

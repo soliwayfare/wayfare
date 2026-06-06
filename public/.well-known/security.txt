@@ -1,0 +1,4 @@
+Contact: mailto:security@iwj.moe
+Expires: 2027-06-06T00:00:00.000Z
+Preferred-Languages: en, zh
+Canonical: https://iwj.moe/.well-known/security.txt

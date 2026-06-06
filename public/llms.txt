@@ -1,0 +1,15 @@
+# WangJie's blog
+
+> Personal blog of Wang Jie — writing on technology, games, and algorithms. Posts are primarily in Chinese (zh-CN).
+
+## Site
+
+- [Homepage](https://iwj.moe/): profile, links, and latest writing
+- [Blog index](https://iwj.moe/blog/): all posts, newest first
+- [Archives](https://iwj.moe/blog/archives/): posts grouped by year
+- [Tags](https://iwj.moe/blog/tags/): posts by topic
+
+## Feeds & maps
+
+- [Atom feed](https://iwj.moe/blog/atom.xml): the 10 most recent posts, full content
+- [Sitemap](https://iwj.moe/sitemap-index.xml): every page on the site

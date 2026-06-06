@@ -39,3 +39,22 @@ export function excerptHtml(post: Post): string {
 export function hasMore(post: Post): boolean {
   return MORE_RE.test(post.body ?? '');
 }
+
+// Plain-text excerpt for <meta name="description"> / OG. Renders the body to
+// HTML, strips tags + collapses whitespace, then truncates on a word/character
+// boundary. Returns '' when the post has no usable lead text (caller falls back
+// to the site description).
+export function plainExcerpt(post: Post, maxLen = 160): string {
+  const body = post.body ?? '';
+  const idx = body.search(MORE_RE);
+  const raw = (idx === -1 ? body : body.slice(0, idx)).trim();
+  if (!raw) return '';
+  const html = marked.parse(raw, { async: false }) as string;
+  const text = html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[a-z]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen - 1).trimEnd() + '…';
+}

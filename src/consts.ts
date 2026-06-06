@@ -19,8 +19,15 @@ export const MASTODON = {
   handle: 'wangjie',
 } as const;
 
-// Google Analytics (Universal Analytics) tracking id.
-export const GA_ID = 'UA-65598064-1';
+// Default Open Graph / Twitter share image (the GitHub avatar, served at 512px).
+export const OG_IMAGE = 'https://github.com/cnwangjie.png?size=512';
+
+// Profiles linked from the homepage; emitted as schema.org Person.sameAs in JSON-LD.
+export const SAME_AS = [
+  'https://github.com/cnwangjie',
+  'https://x.com/wangjie000',
+  'https://steamcommunity.com/id/cnwangjie/',
+];
 
 // Posts per page on the paginated index.
 export const PER_PAGE = 10;

@@ -5,8 +5,9 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostMeta from '../../../components/PostMeta.astro';
 import Paginator from '../../../components/Paginator.astro';
 import Disqus from '../../../components/Disqus.astro';
-import { getSortedPosts, postPath, postSlug } from '../../../utils/posts';
+import { getSortedPosts, postPath, postSlug, plainExcerpt } from '../../../utils/posts';
 import { withBase } from '../../../utils/url';
+import { SITE } from '../../../consts';
 
 export const getStaticPaths = (async () => {
   const posts = await getSortedPosts();
@@ -27,9 +28,15 @@ const { Content } = await render(post);
 // Keep the old Hexo page.path so existing Disqus threads stay attached.
 const identifier = `post/${postSlug(post)}/`;
 const url = new URL(Astro.url.pathname, Astro.site).href;
+const description = plainExcerpt(post) || SITE.description;
 ---
 
-<BaseLayout title={post.data.title} description={post.data.title}>
+<BaseLayout
+  title={post.data.title}
+  description={description}
+  type="article"
+  publishedDate={post.data.date}
+>
   <article class="post-single">
     <h1 class="post-title" set:html={post.data.title} />
     <PostMeta date={post.data.date} from={post.data.from} />

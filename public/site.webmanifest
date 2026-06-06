@@ -1,0 +1,16 @@
+{
+  "name": "WangJie's blog",
+  "short_name": "WangJie",
+  "description": "分享生活中的乐趣",
+  "lang": "zh-cn",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "theme_color": "#2f9e6e",
+  "background_color": "#fcfcfb",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}
