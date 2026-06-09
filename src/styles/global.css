@@ -188,6 +188,13 @@ img {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+}
+
+/* Only a freshly-added image fades in. The class is dropped once the image has
+   settled (see dynamic-background.ts) so the persisted .bg layer carries no
+   animation — otherwise re-adopting the node on every SPA navigation would
+   replay this fade from opacity 0 and the background would blink. */
+.bg .cur.bg-enter {
   animation: bg-fadein 1s;
 }
 

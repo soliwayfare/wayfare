@@ -78,14 +78,19 @@ const changeBackground = async (bg: HTMLDivElement) => {
   currentImageUrl = url;
   const item = document.createElement('div');
   item.style.backgroundImage = 'url(' + url + ')';
-  item.className = 'cur';
+  // `bg-enter` makes only this fresh image fade in.
+  item.className = 'cur bg-enter';
   bg.appendChild(item);
 
-  // Wait for fade-in to complete before removing old backgrounds
+  // Wait for fade-in to complete, then drop the old images and clear the
+  // `bg-enter` class from the surviving one. Once settled it has no animation,
+  // so re-adopting the persisted .bg on SPA navigation no longer replays the
+  // fade (which used to make the background blink between pages).
   setTimeout(() => {
     while (bg.children.length > 1) {
       bg.removeChild(bg.children[0]);
     }
+    (bg.lastElementChild as HTMLElement | null)?.classList.remove('bg-enter');
   }, FADE_DURATION);
 };
 
