@@ -1,0 +1,534 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const statusLabels = {
+  deprecated: 'Deprecated',
+  trial: 'Trial',
+  normal: 'Normal',
+  heavy: 'Heavy',
+} as const;
+
+const svgLogo = (file: string) => `https://cdn.svglogos.dev/logos/${file}`;
+const iconify = (icon: string) => `https://api.iconify.design/${icon}.svg`;
+
+const logos: Record<string, string> = {
+  Arc: svgLogo('arc.svg'),
+  Vivaldi: svgLogo('vivaldi-icon.svg'),
+  Hyper: svgLogo('hyper.svg'),
+  WezTerm: iconify('simple-icons:wezterm'),
+  Ghostty: iconify('simple-icons:ghostty'),
+  Tmux: iconify('simple-icons:tmux'),
+  Notion: svgLogo('notion-icon.svg'),
+  Obsidian: svgLogo('obsidian-icon.svg'),
+  LastPass: iconify('simple-icons:lastpass'),
+  Bitwarden: iconify('simple-icons:bitwarden'),
+  'VS Code': svgLogo('visual-studio-code.svg'),
+  Zed: iconify('simple-icons:zedindustries'),
+  Helix: iconify('simple-icons:helix'),
+  mise: iconify('vscode-icons:file-type-mise'),
+};
+
+const groups = [
+  {
+    name: 'Browsers',
+    note: 'Where most reading, searching, and web apps happen.',
+    items: [
+      {
+        name: 'Arc',
+        description: 'Previously used as the primary browser for spaces and tab handling.',
+        href: 'https://arc.net',
+        status: 'deprecated',
+      },
+      {
+        name: 'Vivaldi',
+        description: 'Current daily browser with flexible tabs, panels, and customization.',
+        href: 'https://vivaldi.com',
+        since: '2025',
+        status: 'heavy',
+      },
+    ],
+  },
+  {
+    name: 'Terminals',
+    note: 'Terminal apps I have used for daily command-line work.',
+    items: [
+      {
+        name: 'Hyper',
+        description: 'Previously used terminal app with a web-tech extension model.',
+        href: 'https://hyper.is',
+        status: 'deprecated',
+      },
+      {
+        name: 'WezTerm',
+        description: 'GPU-accelerated terminal with rich configuration.',
+        href: 'https://wezfurlong.org/wezterm/',
+        status: 'deprecated',
+      },
+      {
+        name: 'Ghostty',
+        description: 'Current terminal focused on speed, platform integration, and simplicity.',
+        href: 'https://ghostty.org',
+        since: '2025',
+        status: 'heavy',
+      },
+    ],
+  },
+  {
+    name: 'Terminal Multiplexers',
+    note: 'Session management and terminal workspaces.',
+    items: [
+      {
+        name: 'Tmux',
+        description: 'Classic terminal multiplexer previously used for persistent sessions.',
+        href: 'https://github.com/tmux/tmux/wiki',
+        status: 'deprecated',
+      },
+      {
+        name: 'Zellij',
+        description: 'Terminal workspace manager with layouts, panes, and a friendly UI.',
+        href: 'https://zellij.dev',
+        since: '2025',
+        status: 'normal',
+      },
+      {
+        name: 'Herdr',
+        description: 'Current terminal workspace tool in active daily use.',
+        href: 'https://herdr.dev',
+        since: '2026.6',
+        status: 'trial',
+      },
+    ],
+  },
+  {
+    name: 'Notes',
+    note: 'Notes, drafts, long-form writing, and personal knowledge.',
+    items: [
+      {
+        name: 'Notion',
+        description: 'Previously used workspace for notes, docs, and databases.',
+        href: 'https://www.notion.so',
+        status: 'deprecated',
+      },
+      {
+        name: 'Obsidian',
+        description: 'Local-first notes, drafts, references, and personal knowledge base.',
+        href: 'https://obsidian.md',
+        since: '2025',
+        status: 'heavy',
+      },
+    ],
+  },
+  {
+    name: 'Password Managers',
+    note: 'Credentials, secrets, and command-line password storage.',
+    items: [
+      {
+        name: 'LastPass',
+        description: 'Previously used password manager.',
+        href: 'https://www.lastpass.com',
+        status: 'deprecated',
+      },
+      {
+        name: 'Bitwarden',
+        description: 'Cross-platform password manager and vault.',
+        href: 'https://bitwarden.com',
+        since: '2023',
+        status: 'heavy',
+      },
+      {
+        name: 'gopass',
+        description: 'Git-backed command-line password manager.',
+        href: 'https://www.gopass.pw',
+        since: '2026',
+        status: 'normal',
+      },
+    ],
+  },
+  {
+    name: 'Editors',
+    note: 'Text editors for code, notes, and focused terminal editing.',
+    items: [
+      {
+        name: 'VS Code',
+        description: 'Previously used main editor with a broad extension ecosystem.',
+        href: 'https://code.visualstudio.com',
+        status: 'deprecated',
+      },
+      {
+        name: 'Zed',
+        description: 'Fast native editor for focused project work.',
+        href: 'https://zed.dev',
+        since: '2026',
+        status: 'normal',
+      },
+      {
+        name: 'Helix',
+        description: 'Modal terminal editor with built-in language server support.',
+        href: 'https://helix-editor.com',
+        since: '2026',
+        status: 'heavy',
+      },
+    ],
+  },
+  {
+    name: 'Package Managers',
+    note: 'Toolchain and runtime version management.',
+    items: [
+      {
+        name: 'mise',
+        description: 'Tool and runtime version manager for local development environments.',
+        href: 'https://mise.jdx.dev',
+        status: 'heavy',
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout title="Stack" description="Software I use day to day.">
+  <article class="stack-page">
+    <header class="stack-hero">
+      <div>
+        <p class="stack-kicker">Toolbox</p>
+        <h1>Stack</h1>
+        <p>
+          Software I use day to day for browsing, coding, writing, communication,
+          system utilities, and relaxing after work.
+        </p>
+        <p class="status-guide">
+          Status marks how each app fits into my workflow:
+          <span class="status-mini stack-status-heavy">Heavy</span> means it is a daily driver,
+          <span class="status-mini stack-status-normal">Normal</span> means I use it regularly,
+          <span class="status-mini stack-status-trial">Trial</span> means I am still trying it out,
+          and <span class="status-mini stack-status-deprecated">Deprecated</span> means it is no longer in use.
+        </p>
+      </div>
+    </header>
+
+    <div class="stack-groups">
+      {
+        groups.map((group) => (
+          <section class="stack-group" aria-labelledby={`stack-${group.name.toLowerCase()}`}>
+            <header class="stack-group-head">
+              <div>
+                <h2 id={`stack-${group.name.toLowerCase()}`}>{group.name}</h2>
+                <p>{group.note}</p>
+              </div>
+              <span>{group.items.length} items</span>
+            </header>
+            <ul class="stack-list">
+              {
+                group.items.map((item) => {
+                  const deprecated = item.status === 'deprecated';
+                  const Tag = deprecated ? 'div' : 'a';
+                  const logoUrl = logos[item.name];
+                  return (
+                    <li>
+                      <Tag
+                        class:list={['stack-item', deprecated && 'is-deprecated']}
+                        href={deprecated ? undefined : item.href}
+                        target={!deprecated && item.href.startsWith('http') ? '_blank' : undefined}
+                        rel={!deprecated && item.href.startsWith('http') ? 'noopener' : undefined}
+                      >
+                        <span class="stack-icon" aria-hidden="true">
+                          {logoUrl ? (
+                            <img src={logoUrl} alt="" loading="lazy" />
+                          ) : (
+                            item.name.slice(0, 1)
+                          )}
+                        </span>
+                        <span class="stack-item-main">
+                          <span class="stack-item-top">
+                            <strong>{item.name}</strong>
+                          </span>
+                          <span class="stack-description">{item.description}</span>
+                          <span class="stack-meta">
+                            <span class={`stack-status stack-status-${item.status}`}>
+                              {statusLabels[item.status]}
+                            </span>
+                            {item.since && <span>Started {item.since}</span>}
+                          </span>
+                        </span>
+                      </Tag>
+                    </li>
+                  );
+                })
+              }
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .stack-page {
+    padding-top: var(--space-2);
+  }
+
+  .stack-hero {
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .stack-kicker {
+    margin: 0 0 var(--space-2);
+    color: var(--accent);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .stack-hero h1 {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(2.1rem, 6vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .stack-hero p:not(.stack-kicker) {
+    max-width: 34rem;
+    margin: var(--space-6) 0 0;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .status-guide {
+    max-width: 34rem;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    color: var(--ink-faint);
+    font-size: 0.82rem;
+    line-height: 1.8;
+  }
+
+  .status-mini,
+  .stack-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.1rem;
+    padding: 0.08rem 0.42rem;
+    border: none;
+    border-radius: 999px;
+    background: var(--badge-bg, color-mix(in srgb, var(--paper-raised) 70%, var(--paper)));
+    box-shadow: inset 0 0 0 1px var(--badge-ring, var(--hairline));
+    color: var(--badge-fg, var(--ink-soft));
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .stack-status {
+    min-height: 1.35rem;
+    padding: 0.12rem 0.48rem;
+    font-size: 0.72rem;
+  }
+
+  .stack-groups {
+    display: grid;
+    gap: var(--space-10, 2.5rem);
+    margin-top: var(--space-8);
+  }
+
+  .stack-group-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .stack-group-head h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+
+  .stack-group-head p {
+    margin: var(--space-1) 0 0;
+    color: var(--ink-faint);
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .stack-group-head > span {
+    flex: 0 0 auto;
+    color: var(--ink-faint);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .stack-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stack-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    min-height: 8rem;
+    height: 100%;
+    padding: var(--space-4);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--paper) 96%, transparent), color-mix(in srgb, var(--paper-raised) 86%, transparent));
+    box-shadow:
+      0 1px 0 color-mix(in srgb, white 50%, transparent) inset,
+      0 8px 22px rgba(0, 0, 0, 0.07);
+    transition:
+      background var(--dur) var(--ease),
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+
+  .stack-item:hover {
+    border-color: color-mix(in srgb, var(--accent) 38%, var(--hairline));
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--paper) 98%, transparent), color-mix(in srgb, var(--accent-soft) 28%, var(--paper-raised)));
+    box-shadow:
+      0 1px 0 color-mix(in srgb, white 55%, transparent) inset,
+      0 14px 30px rgba(0, 0, 0, 0.11);
+    transform: translateY(-2px);
+  }
+
+  .stack-item.is-deprecated {
+    border-color: var(--hairline);
+    background: color-mix(in srgb, var(--paper-raised) 42%, transparent);
+    box-shadow: none;
+    cursor: default;
+  }
+
+  .stack-item.is-deprecated:hover {
+    border-color: var(--hairline);
+    background: color-mix(in srgb, var(--paper-raised) 42%, transparent);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .stack-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    background: var(--paper);
+    color: var(--accent-strong);
+    font-size: 0.9rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .stack-icon img {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+    object-fit: contain;
+  }
+
+  .stack-item-main {
+    display: grid;
+    gap: var(--space-3);
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .stack-item-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .stack-item-top strong {
+    color: var(--ink);
+    font-size: 1.08rem;
+    line-height: 1.35;
+  }
+
+  .stack-description {
+    color: var(--ink-soft);
+    font-size: 0.93rem;
+    line-height: 1.5;
+  }
+
+  .stack-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--ink-faint);
+    font-size: 0.76rem;
+    line-height: 1.4;
+  }
+
+  .stack-status-deprecated {
+    --badge-bg: color-mix(in srgb, var(--ink-faint) 8%, var(--paper));
+    --badge-ring: color-mix(in srgb, var(--ink-faint) 22%, transparent);
+    --badge-fg: var(--ink-faint);
+  }
+
+  .stack-status-trial {
+    --badge-bg: color-mix(in srgb, #f59e0b 10%, var(--paper));
+    --badge-ring: color-mix(in srgb, #f59e0b 26%, transparent);
+    --badge-fg: #b45309;
+  }
+
+  .stack-status-normal {
+    --badge-bg: color-mix(in srgb, #3b82f6 10%, var(--paper));
+    --badge-ring: color-mix(in srgb, #3b82f6 26%, transparent);
+    --badge-fg: #2563eb;
+  }
+
+  .stack-status-heavy {
+    --badge-bg: color-mix(in srgb, var(--accent) 11%, var(--paper));
+    --badge-ring: color-mix(in srgb, var(--accent) 28%, transparent);
+    --badge-fg: var(--accent-strong);
+  }
+
+  @media (max-width: 760px) {
+    .stack-list {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .stack-hero p:not(.stack-kicker) {
+      font-size: 1rem;
+    }
+
+    .stack-group-head {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .stack-item {
+      min-height: 0;
+      padding: var(--space-4);
+    }
+  }
+</style>

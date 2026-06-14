@@ -39,6 +39,7 @@ export const BLOG_BASE = '/blog';
 // External links open in a new tab.
 export const NAV: { label: string; href: string; external?: boolean }[] = [
   { label: 'HOME', href: '/' },
+  { label: 'STACK', href: '/stack/' },
   { label: 'BLOG', href: '/blog/' },
   { label: 'ARCHIVE', href: '/blog/archives/' },
   { label: 'MASTODON', href: '/blog/mastodon/' },
