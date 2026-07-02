@@ -1,12 +1,17 @@
 ---
-import { NAV } from '../consts';
+import { NAV } from '../consts'
 
 // NAV hrefs are already full site paths, so the active item is an exact match
 // against the current pathname (home `/` only matches `/`, not `/blog/...`).
-const current = Astro.url.pathname;
+const current = Astro.url.pathname
+
+const navClass = 'nav m-0 flex list-none flex-wrap gap-6 p-0'
+const linkClass =
+  "relative px-0 py-0.5 text-[0.72rem] font-semibold tracking-[0.12em] text-ink-faint no-underline transition-colors duration-[var(--dur)] ease-[var(--ease)] after:absolute after:left-0 after:-bottom-0.5 after:h-[1.5px] after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-[var(--dur)] after:ease-[var(--ease)] after:content-[''] hover:text-ink hover:after:scale-x-100"
+const activeClass = 'text-ink after:scale-x-100'
 ---
 
-<ul class="nav">
+<ul class={navClass}>
   {
     NAV.map((item) => {
       const active = !item.external && current === item.href;
@@ -14,7 +19,7 @@ const current = Astro.url.pathname;
         <li>
           <a
             href={item.href}
-            class={active ? 'active' : undefined}
+            class:list={[linkClass, active && 'active', active && activeClass]}
             data-path={item.external ? undefined : item.href}
             target={item.external ? '_blank' : undefined}
             rel={item.external ? 'noopener' : undefined}
@@ -26,3 +31,13 @@ const current = Astro.url.pathname;
     })
   }
 </ul>
+
+<style is:global>
+  .nav a.active {
+    color: var(--ink);
+  }
+
+  .nav a.active::after {
+    transform: scaleX(1);
+  }
+</style>

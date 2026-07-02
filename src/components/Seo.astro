@@ -2,21 +2,21 @@
 // Single source of truth for everything in <head> except <ClientRouter /> and
 // the <html lang> element (those stay in the layouts). Both BaseLayout and
 // HomeLayout render this so the metadata stays consistent.
-import { SITE, OG_IMAGE, SAME_AS } from '../consts';
-import { withBase } from '../utils/url';
+import { SITE, OG_IMAGE, SAME_AS } from '../consts'
+import { withBase } from '../utils/url'
 
 interface Props {
   // Full document title, e.g. "Post · WangJie's blog".
-  pageTitle: string;
-  description: string;
-  canonical: string;
-  type?: 'website' | 'article';
-  image?: string;
+  pageTitle: string
+  description: string
+  canonical: string
+  type?: 'website' | 'article'
+  image?: string
   // og:locale, e.g. "zh_CN" (blog) or "en_US" (home).
-  locale?: string;
+  locale?: string
   // For type === 'article': the post title and publish date.
-  articleTitle?: string;
-  publishedDate?: Date;
+  articleTitle?: string
+  publishedDate?: Date
 }
 
 const {
@@ -28,9 +28,9 @@ const {
   locale = 'zh_CN',
   articleTitle,
   publishedDate,
-} = Astro.props;
+} = Astro.props
 
-const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : '';
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : ''
 
 // schema.org graph: always a WebSite + Person; a BlogPosting is appended for
 // article pages. Serialized as a single JSON-LD block.
@@ -39,7 +39,7 @@ const person = {
   name: SITE.author,
   url: `${siteUrl}/`,
   sameAs: SAME_AS,
-};
+}
 const graph: Record<string, unknown>[] = [
   {
     '@type': 'WebSite',
@@ -50,7 +50,7 @@ const graph: Record<string, unknown>[] = [
     author: person,
   },
   person,
-];
+]
 if (type === 'article') {
   graph.push({
     '@type': 'BlogPosting',
@@ -62,9 +62,12 @@ if (type === 'article') {
     image,
     author: person,
     ...(publishedDate ? { datePublished: publishedDate.toISOString() } : {}),
-  });
+  })
 }
-const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': graph,
+})
 ---
 
 <meta charset="utf-8" />

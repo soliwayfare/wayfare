@@ -2,13 +2,13 @@
 interface Props {
   // Stable thread id; must match the old Hexo page.path to keep existing
   // comment threads (e.g. "post/why-not-try-linux/").
-  identifier: string;
+  identifier: string
   // Canonical page URL used by Disqus, matching the old config.url + path.
-  url: string;
-  title: string;
+  url: string
+  title: string
 }
 
-const { identifier, url, title } = Astro.props;
+const { identifier, url, title } = Astro.props
 ---
 
 {/* Loading is handled by a global astro:page-load handler in BaseLayout that

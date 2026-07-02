@@ -1,10 +1,10 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getTagMap } from '../../../utils/tags';
-import { withBase } from '../../../utils/url';
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import { getTagMap } from '../../../utils/tags'
+import { withBase } from '../../../utils/url'
 
-const tagMap = await getTagMap();
-const tags = [...tagMap.entries()].sort((a, b) => b[1].length - a[1].length);
+const tagMap = await getTagMap()
+const tags = [...tagMap.entries()].sort((a, b) => b[1].length - a[1].length)
 ---
 
 <BaseLayout title="标签">
@@ -23,3 +23,46 @@ const tags = [...tagMap.entries()].sort((a, b) => b[1].length - a[1].length);
     )
   }
 </BaseLayout>
+
+<style is:global>
+  .page-title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: var(--space-4) 0 var(--space-8);
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin: var(--space-6) 0;
+  }
+
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.3rem 0.85rem;
+    background: var(--paper-raised);
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    transition:
+      color var(--dur) var(--ease),
+      border-color var(--dur) var(--ease),
+      background var(--dur) var(--ease);
+  }
+
+  .tag-chip span {
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tag-chip:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
+</style>

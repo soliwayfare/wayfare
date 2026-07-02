@@ -72,3 +72,159 @@
     saveBtn?.addEventListener('click', () => controls?.saveCurrentImage());
   }
 </script>
+
+<style is:global>
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 1;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: bg-gradient 15s ease infinite;
+    transition: opacity 4s ease-in-out;
+  }
+
+  .bg .cur {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .bg .cur.bg-enter {
+    animation: bg-fadein 1s;
+  }
+
+  @keyframes bg-fadein {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes bg-gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .bg-controls {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: var(--space-3);
+    z-index: 10;
+  }
+
+  .bg-fab {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 50%;
+    padding: 0;
+    background: color-mix(in srgb, var(--paper) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+    color: var(--ink-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      color var(--dur) var(--ease),
+      transform var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  .bg-fab:hover {
+    color: var(--ink);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+  }
+
+  .bg-fab:active {
+    transform: translateY(0);
+  }
+
+  .bg-fab-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    pointer-events: none;
+  }
+
+  .bg-fab-track {
+    stroke: color-mix(in srgb, var(--ink) 14%, transparent);
+    stroke-width: 2.5;
+  }
+
+  .bg-fab-progress {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+
+  .bg-fab-icon {
+    display: flex;
+    position: relative;
+  }
+
+  .bg-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--paper) 72%, transparent);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    color: var(--ink-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(12px) scale(0.8);
+    pointer-events: none;
+    transition:
+      opacity var(--dur) var(--ease),
+      transform var(--dur) var(--ease),
+      color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  .bg-controls:hover .bg-btn,
+  .bg-controls:focus-within .bg-btn {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .bg-btn:hover {
+    color: var(--ink);
+    transform: translateY(-1px) scale(1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  }
+
+  .bg-btn:active {
+    transform: translateY(0) scale(1);
+  }
+</style>

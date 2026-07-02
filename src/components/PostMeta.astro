@@ -1,13 +1,13 @@
 ---
-import { formatDate, isoDate } from '../utils/date';
+import { formatDate, isoDate } from '../utils/date'
 
 interface Props {
-  date: Date;
+  date: Date
   // Source URL for translated posts; renders the "翻译 · 原文地址" link.
-  from?: string;
+  from?: string
 }
 
-const { date, from } = Astro.props;
+const { date, from } = Astro.props
 ---
 
 <div class="post-info">
@@ -20,3 +20,37 @@ const { date, from } = Astro.props;
     )
   }
 </div>
+
+<style is:global>
+  .post-info {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: var(--space-3);
+  }
+
+  .post-from {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    color: var(--accent);
+    position: relative;
+    padding-left: var(--space-3);
+  }
+
+  .post-from::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: 0.9em;
+    transform: translateY(-50%);
+    background: var(--hairline);
+  }
+</style>

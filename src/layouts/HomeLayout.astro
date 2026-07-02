@@ -31,13 +31,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   </head>
   <body class="home">
     <SiteBackground />
-    <div class="home-wrap">
-      <header class="home-header">
-        <div class="masthead-glass" transition:name="surface" aria-hidden="true"></div>
-        <a class="home-brand" href="/">{SITE.author}</a>
+    <div class="home-wrap relative z-[1] flex min-h-screen flex-col gap-5 p-5">
+      <header
+        class="relative mx-auto flex w-full max-w-[44rem] shrink-0 items-center justify-between gap-6 px-[1.4rem] py-[0.7rem] max-[640px]:flex-col max-[640px]:gap-2 [&>.nav]:relative [&>.nav]:z-[1]"
+      >
+        <div
+          class="absolute inset-0 z-0 rounded-full border border-hairline bg-[color-mix(in_srgb,var(--paper)_80%,transparent)] shadow-[0_4px_20px_rgba(0,0,0,0.1)] backdrop-blur-[20px] backdrop-saturate-[180%] max-[640px]:rounded-[18px]"
+          transition:name="surface"
+          aria-hidden="true"
+        >
+        </div>
+        <a class="relative z-[1] whitespace-nowrap text-[0.95rem] font-bold tracking-[-0.01em] text-ink no-underline" href="/">{SITE.author}</a>
         <Nav />
       </header>
-      <main class="home-main">
+      <main class="flex flex-1 items-center justify-center">
         <slot />
       </main>
     </div>
@@ -62,72 +69,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         margin: 0;
       }
 
-      /* Layout shell — lifted above the fixed background (z-index:0) */
-      .home .home-wrap {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        padding: 1.25rem;
-        gap: 1.25rem;
-      }
-
-      /* Top header: brand left, shared <Nav> right — same structure as the blog
-         header. The readable glass bar lives in a separate .masthead-glass
-         layer so it can carry its own view transition (it grows to fill the
-         screen when leaving the homepage). The header itself is just layout. */
-      .home .home-header {
-        position: relative;
-        flex-shrink: 0;
-        width: 100%;
-        max-width: 44rem;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--space-6);
-        padding: 0.7rem 1.4rem;
-      }
-
-      /* The glass background of the home nav, behind the brand + nav. It shares
-         transition:name="surface" with the blog's .page-surface, so on leaving
-         the homepage this pill morphs (grows + thickens from frosted to nearly
-         opaque) into the inner page's reading panel over the same photo. */
-      .home .masthead-glass {
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        border-radius: 999px;
-        background: color-mix(in srgb, var(--paper) 80%, transparent);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-        border: 1px solid var(--hairline);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      }
-
-      /* Keep the brand + nav above the glass layer. */
-      .home .home-header > .home-brand,
-      .home .home-header > .nav {
-        position: relative;
-        z-index: 1;
-      }
-
-      .home .home-brand {
-        font-size: 0.95rem;
-        font-weight: 700;
-        letter-spacing: -0.01em;
-        color: var(--ink);
-        white-space: nowrap;
-      }
-
-      .home .home-main {
-        flex: 1 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
       .home .home-card {
         width: 38rem;
         max-width: 100%;
@@ -141,13 +82,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       }
 
       @media (max-width: 640px) {
-        .home .home-header {
-          flex-direction: column;
-          gap: var(--space-2);
-        }
-        .home .masthead-glass {
-          border-radius: 18px;
-        }
         .home .home-card {
           padding: var(--space-8) var(--space-6);
         }

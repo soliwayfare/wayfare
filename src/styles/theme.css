@@ -1,0 +1,99 @@
+/* Refined editorial minimalism: a calm, paper-warm reading surface with
+   confident typography, generous rhythm, and an intentional green accent.
+   Ported and modernized from the apollo Hexo theme. */
+
+@theme {
+  --font-sans:
+    "sourcesanspro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "HarmonyOS Sans SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans CJK SC", sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-hairline: var(--hairline);
+
+  --radius-site: var(--radius);
+}
+
+@font-face {
+  font-family: "sourcesanspro";
+  src:
+    url("/blog/fonts/sourcesanspro.woff2") format("woff2"),
+    url("/blog/fonts/sourcesanspro.woff") format("woff");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Match the UA canvas, scrollbars and form controls to light/dark so the
+     base layer never flashes white (e.g. mid page-transition in dark mode). */
+  color-scheme: light dark;
+
+  /* Accent (kept from apollo, used sparingly and intentionally) */
+  --accent: #2f9e6e;
+  --accent-strong: #247a55;
+  --accent-soft: rgba(47, 158, 110, 0.12);
+
+  /* Ink + paper neutrals (warm, high-contrast, AAA) */
+  --ink: #1f2328;
+  --ink-soft: #4a5159;
+  --ink-faint: #828d97;
+  --paper: #fcfcfb;
+  --paper-raised: #f5f5f2;
+  --hairline: #e7e7e2;
+  --code-inline: #b5520a;
+  --code-inline-bg: #f1f0ec;
+  --selection: rgba(47, 158, 110, 0.22);
+
+  /* Type */
+  --font-sans:
+    "sourcesanspro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "HarmonyOS Sans SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans CJK SC", sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --measure: 48rem; /* content column width; fluid below this via 100% width + padding */
+  --radius: 8px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 180ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #4ecb94;
+    --accent-strong: #6fdaa9;
+    --accent-soft: rgba(78, 203, 148, 0.15);
+
+    --ink: #e7eaed;
+    --ink-soft: #aeb6bf;
+    --ink-faint: #7b848d;
+    --paper: #131619;
+    --paper-raised: #1b1f23;
+    --hairline: #282d33;
+    --code-inline: #f0934e;
+    --code-inline-bg: #21262b;
+    --selection: rgba(78, 203, 148, 0.26);
+  }
+}

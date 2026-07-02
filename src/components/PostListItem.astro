@@ -1,16 +1,16 @@
 ---
-import type { Post } from '../utils/posts';
-import { postPath, excerptHtml, hasMore } from '../utils/posts';
-import { withBase } from '../utils/url';
-import PostMeta from './PostMeta.astro';
+import type { Post } from '../utils/posts'
+import { postPath, excerptHtml, hasMore } from '../utils/posts'
+import { withBase } from '../utils/url'
+import PostMeta from './PostMeta.astro'
 
 interface Props {
-  post: Post;
+  post: Post
 }
 
-const { post } = Astro.props;
-const href = withBase(postPath(post));
-const excerpt = excerptHtml(post);
+const { post } = Astro.props
+const href = withBase(postPath(post))
+const excerpt = excerptHtml(post)
 ---
 
 <li class="post-list-item">
@@ -23,3 +23,96 @@ const excerpt = excerptHtml(post);
     {hasMore(post) && <a class="read-more" href={href}>阅读全文</a>}
   </article>
 </li>
+
+<style is:global>
+  .post-list {
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .post-list-item {
+    padding: var(--space-8) 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .post-list-item:last-child {
+    border-bottom: none;
+  }
+
+  .post-title {
+    margin: 0 0 var(--space-2);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+
+  .post-title-link {
+    color: var(--ink);
+    transition: color var(--dur) var(--ease);
+  }
+
+  .post-title-link:hover {
+    color: var(--accent);
+  }
+
+  .post-excerpt {
+    color: var(--ink-soft);
+    font-size: 1rem;
+  }
+
+  .post-excerpt p {
+    margin: 0.5rem 0;
+  }
+
+  .post-excerpt a {
+    color: var(--accent-strong);
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    transition:
+      background-size var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+    padding-bottom: 1px;
+  }
+
+  .post-excerpt a:hover {
+    color: var(--accent);
+    background-size: 100% 2px;
+  }
+
+  .read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    margin-top: var(--space-3);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    transition:
+      gap var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+  }
+
+  .read-more::after {
+    content: "→";
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .read-more:hover {
+    color: var(--accent-strong);
+  }
+
+  .read-more:hover::after {
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 640px) {
+    .post-title {
+      font-size: 1.3rem;
+    }
+  }
+</style>

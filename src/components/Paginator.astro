@@ -1,13 +1,13 @@
 ---
 interface Props {
   // Resolved hrefs (already base-prefixed) or null when absent.
-  prevLabel: string;
-  nextLabel: string;
-  prevUrl?: string | null;
-  nextUrl?: string | null;
+  prevLabel: string
+  nextLabel: string
+  prevUrl?: string | null
+  nextUrl?: string | null
 }
 
-const { prevLabel, nextLabel, prevUrl, nextUrl } = Astro.props;
+const { prevLabel, nextLabel, prevUrl, nextUrl } = Astro.props
 ---
 
 {
@@ -28,3 +28,29 @@ const { prevLabel, nextLabel, prevUrl, nextUrl } = Astro.props;
     </nav>
   )
 }
+
+<style is:global>
+  .paginator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-12);
+    font-weight: 600;
+    font-size: 0.88rem;
+  }
+
+  .paginator a {
+    color: var(--ink-soft);
+    transition: color var(--dur) var(--ease);
+  }
+
+  .paginator a:hover {
+    color: var(--accent);
+  }
+
+  .paginator .next {
+    margin-left: auto;
+    text-align: right;
+  }
+</style>

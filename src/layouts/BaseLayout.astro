@@ -1,26 +1,27 @@
 ---
-import { ClientRouter } from 'astro:transitions';
-import { SITE } from '../consts';
-import { withBase } from '../utils/url';
-import Nav from '../components/Nav.astro';
-import SiteBackground from '../components/SiteBackground.astro';
-import Seo from '../components/Seo.astro';
-import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions'
+import { SITE } from '../consts'
+import { withBase } from '../utils/url'
+import Nav from '../components/Nav.astro'
+import SiteBackground from '../components/SiteBackground.astro'
+import Seo from '../components/Seo.astro'
+import '../styles/global.css'
 
 interface Props {
-  title?: string;
-  description?: string;
+  title?: string
+  description?: string
   // Set 'article' on blog-post pages so Seo emits BlogPosting JSON-LD + og:type.
-  type?: 'website' | 'article';
-  publishedDate?: Date;
+  type?: 'website' | 'article'
+  publishedDate?: Date
 }
 
-const { title, description, type = 'website', publishedDate } = Astro.props;
-const pageTitle = title ? `${title} · ${SITE.title}` : SITE.title;
-const metaDesc = description || SITE.description;
-const year = new Date().getFullYear();
-const copyrightYears = year === SITE.startYear ? `${year}` : `${SITE.startYear} - ${year}`;
-const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const { title, description, type = 'website', publishedDate } = Astro.props
+const pageTitle = title ? `${title} · ${SITE.title}` : SITE.title
+const metaDesc = description || SITE.description
+const year = new Date().getFullYear()
+const copyrightYears =
+  year === SITE.startYear ? `${year}` : `${SITE.startYear} - ${year}`
+const canonical = new URL(Astro.url.pathname, Astro.site).href
 ---
 
 <!doctype html>
@@ -100,3 +101,107 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     </script>
   </body>
 </html>
+
+<style is:global>
+  .wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    max-width: 52rem;
+    margin: 0 auto;
+  }
+
+  .page-surface {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-left: 1px solid var(--hairline);
+    border-right: 1px solid var(--hairline);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .container {
+    width: 100%;
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    flex: 1 0 auto;
+  }
+
+  .site-header {
+    width: 100%;
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: var(--space-12) 1.5rem var(--space-8);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-6);
+  }
+
+  .logo-link {
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .logo-link h1 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+  }
+
+  .site-footer {
+    flex-shrink: 0;
+    max-width: var(--measure);
+    width: 100%;
+    margin: var(--space-16) auto 0;
+    padding: var(--space-6) 1.5rem var(--space-12);
+    border-top: 1px solid var(--hairline);
+    color: var(--ink-faint);
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+  }
+
+  .site-footer a {
+    color: var(--ink-soft);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur) var(--ease);
+  }
+
+  .site-footer a:hover {
+    border-bottom-color: var(--accent);
+  }
+
+  .wrap > .site-header,
+  .wrap > .container,
+  .wrap > .site-footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 56rem) {
+    .page-surface {
+      border-left: none;
+      border-right: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    body {
+      font-size: 16px;
+    }
+
+    .site-header {
+      padding-top: var(--space-8);
+      padding-bottom: var(--space-6);
+    }
+  }
+</style>

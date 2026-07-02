@@ -1,20 +1,23 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getSortedPosts, postPath } from '../../../utils/posts';
-import { withBase } from '../../../utils/url';
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import { getSortedPosts, postPath } from '../../../utils/posts'
+import { withBase } from '../../../utils/url'
 
-const posts = await getSortedPosts();
+const posts = await getSortedPosts()
 
 // Group newest-first posts by year, preserving order.
-const byYear: { year: number; posts: typeof posts }[] = [];
+const byYear: { year: number; posts: typeof posts }[] = []
 for (const post of posts) {
-  const year = post.data.date.getFullYear();
-  const last = byYear[byYear.length - 1];
-  if (last && last.year === year) last.posts.push(post);
-  else byYear.push({ year, posts: [post] });
+  const year = post.data.date.getFullYear()
+  const last = byYear[byYear.length - 1]
+  if (last && last.year === year) last.posts.push(post)
+  else byYear.push({ year, posts: [post] })
 }
 
-const monthDay = new Intl.DateTimeFormat('zh-CN', { month: '2-digit', day: '2-digit' });
+const monthDay = new Intl.DateTimeFormat('zh-CN', {
+  month: '2-digit',
+  day: '2-digit',
+})
 ---
 
 <BaseLayout title="归档">
@@ -37,3 +40,56 @@ const monthDay = new Intl.DateTimeFormat('zh-CN', { month: '2-digit', day: '2-di
     ))
   }
 </BaseLayout>
+
+<style is:global>
+  .page-title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: var(--space-4) 0 var(--space-8);
+  }
+
+  .archive-year {
+    margin: var(--space-12) 0 var(--space-4);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .archive-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .archive-item {
+    display: flex;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    align-items: baseline;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .archive-item:last-child {
+    border-bottom: none;
+  }
+
+  .archive-item time {
+    flex-shrink: 0;
+    color: var(--ink-faint);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    width: 3.5rem;
+  }
+
+  .archive-item .post-title-link {
+    color: var(--ink-soft);
+    transition: color var(--dur) var(--ease);
+  }
+
+  .archive-item .post-title-link:hover {
+    color: var(--accent);
+  }
+</style>

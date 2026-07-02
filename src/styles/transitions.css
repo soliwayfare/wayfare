@@ -1,0 +1,56 @@
+/* biome-ignore-all lint/correctness/noUnknownTypeSelector: Named View Transition pseudo-elements use custom identifiers. */
+/* biome-ignore-all lint/complexity/noImportantStyles: Transition overrides need to beat Astro/browser transition styles. */
+
+/* View transitions are handled by Astro's <ClientRouter /> (client-side
+   navigation + fade). Astro injects the transition styles and disables them
+   under prefers-reduced-motion automatically. */
+
+/* Shared "surface" morph: the homepage nav glass (.masthead-glass, a small
+   frosted pill) and the inner pages' whole content column (.wrap, a tall
+   near-opaque sheet with its content) carry the same transition name. On
+   leaving home the pill grows into the full panel and the page content
+   cross-fades in *as part of* the morph (so nothing pops in afterwards),
+   reading as "the nav glass enlarges and becomes the page". The reverse plays
+   when returning home. Both sit over the same persisted photo background, so
+   the morph happens against a continuous backdrop. */
+::view-transition-group(surface) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* The persisted background and controls are their own stable layers: hold them
+   perfectly still (no fade/scale) through every transition, and only paint the
+   current copy, so the photo and the bottom-right FAB never flicker, fade, or
+   jump position mid-navigation. */
+::view-transition-group(site-bg),
+::view-transition-group(site-bg-controls),
+::view-transition-old(site-bg),
+::view-transition-new(site-bg),
+::view-transition-old(site-bg-controls),
+::view-transition-new(site-bg-controls) {
+  animation: none !important;
+}
+::view-transition-old(site-bg),
+::view-transition-old(site-bg-controls) {
+  display: none;
+}
+
+::view-transition-old(surface),
+::view-transition-new(surface) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- Motion preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
