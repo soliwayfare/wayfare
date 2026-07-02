@@ -643,7 +643,7 @@ a {
   word-break: break-word;
 }
 
-.post-content :global(.expressive-code) {
+.post-content .expressive-code {
   margin: var(--space-6) 0;
 }
 

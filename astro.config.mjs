@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { unified } from '@astrojs/markdown-remark';
 import sitemap from '@astrojs/sitemap';
 import expressiveCode from 'astro-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
@@ -8,11 +9,17 @@ import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 export default defineConfig({
   site: 'https://iwj.moe',
   trailingSlash: 'always',
+  // Preserve Astro v6 whitespace behavior after v7 changed the default to
+  // `compressHTML: 'jsx'`.
+  compressHTML: true,
   // Prefetch link targets on hover/focus so SPA navigations (ClientRouter)
   // feel instant — the next page is usually already fetched by click time.
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'hover',
+  },
+  markdown: {
+    processor: unified(),
   },
   integrations: [
     expressiveCode({
