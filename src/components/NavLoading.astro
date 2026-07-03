@@ -1,0 +1,136 @@
+---
+// Loading placeholder for client-side navigation. <ClientRouter /> keeps the
+// current page on screen while it fetches/renders the next one, which — with no
+// feedback — reads as the page freezing on click.
+//
+// Behaviour:
+//   • The outgoing text content is hidden the instant navigation starts (before
+//     the view-transition snapshot) so a fast swap never flashes the old page.
+//     The frosted sheet, header and background stay put — only the text goes.
+//   • The spinner is DELAYED: a navigation that finishes quickly just swaps
+//     (content fades straight in, no spinner). Only a navigation slow enough to
+//     otherwise feel frozen reveals the spinner — and once shown it stays up
+//     briefly so it never flickers by.
+//   • When the destination has loaded, the text fades back in.
+// The spinner is persisted so it survives the swap.
+---
+
+<div id="nav-loading" class="nav-loading" aria-hidden="true" transition:persist>
+  <span class="nav-loading__spinner"></span>
+</div>
+
+<script>
+  // Wire once per session; <ClientRouter /> keeps the same window so these
+  // document-level listeners survive navigations.
+  const w = window as any;
+  if (!w.__navLoading) {
+    w.__navLoading = true;
+    const root = document.documentElement;
+    const SPINNER_DELAY = 150; // don't show the spinner for faster loads
+    const SPINNER_MIN = 220; // once shown, keep it at least this long
+    let showTimer: number | undefined;
+    let shownAt = 0;
+    let navigating = false;
+
+    document.addEventListener('astro:before-preparation', () => {
+      navigating = true;
+      shownAt = 0;
+      // Hide the outgoing text immediately (before the snapshot) — no flash.
+      root.classList.add('is-navigating');
+      // Reveal the spinner only if the load is taking a while.
+      clearTimeout(showTimer);
+      showTimer = window.setTimeout(() => {
+        root.classList.add('is-loading');
+        shownAt = Date.now();
+      }, SPINNER_DELAY);
+    });
+
+    document.addEventListener('astro:page-load', () => {
+      if (!navigating) return; // ignore the initial (non-navigation) load
+      navigating = false;
+      clearTimeout(showTimer);
+
+      const reveal = () => {
+        root.classList.remove('is-navigating');
+        root.classList.remove('is-loading');
+        // Fade the destination text in. An animation (not a transition) plays
+        // reliably on the just-swapped nodes.
+        root.classList.remove('is-entering');
+        void root.offsetWidth;
+        root.classList.add('is-entering');
+      };
+
+      // If the spinner is showing, hold it for its minimum so it doesn't flash.
+      const wait = shownAt ? Math.max(0, SPINNER_MIN - (Date.now() - shownAt)) : 0;
+      if (wait) window.setTimeout(reveal, wait);
+      else reveal();
+    });
+  }
+</script>
+
+<style is:global>
+  /* While navigating, hide only the text content + footer. The frosted sheet
+     (transition:persist'd), header and photo background stay put, so the only
+     thing that changes during a navigation is the text. */
+  html.is-navigating main,
+  html.is-navigating .site-footer {
+    visibility: hidden;
+  }
+
+  /* Fade the destination text/footer back in once revealed. */
+  html.is-entering main,
+  html.is-entering .site-footer {
+    animation: nav-content-in 0.5s ease both;
+  }
+  @keyframes nav-content-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .nav-loading {
+    /* Centered in the content column, below the sticky header — not a
+       full-screen overlay. */
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: max(38vh, 12rem);
+    z-index: 40;
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  /* Only shown once a navigation is slow enough (is-loading), not merely while
+     navigating. */
+  html.is-loading .nav-loading {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav-loading__spinner {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 3px solid color-mix(in srgb, var(--ink) 16%, transparent);
+    border-top-color: var(--accent);
+    animation: nav-spin 0.7s linear infinite;
+  }
+
+  @keyframes nav-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-loading__spinner {
+      animation-duration: 1.4s;
+    }
+  }
+</style>

@@ -1,8 +1,9 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../consts';
-import Nav from '../components/Nav.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 import SiteBackground from '../components/SiteBackground.astro';
+import NavLoading from '../components/NavLoading.astro';
 import Seo from '../components/Seo.astro';
 import '../styles/global.css';
 
@@ -31,19 +32,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   </head>
   <body class="home">
     <SiteBackground />
-    <div class="home-wrap relative z-[1] flex min-h-screen flex-col gap-5 p-5">
-      <header
-        class="relative mx-auto flex w-full max-w-[44rem] shrink-0 items-center justify-between gap-6 px-[1.4rem] py-[0.7rem] max-[640px]:flex-col max-[640px]:gap-2 [&>.nav]:relative [&>.nav]:z-[1]"
-      >
-        <div
-          class="absolute inset-0 z-0 rounded-full border border-hairline bg-[color-mix(in_srgb,var(--paper)_80%,transparent)] shadow-[0_4px_20px_rgba(0,0,0,0.1)] backdrop-blur-[20px] backdrop-saturate-[180%] max-[640px]:rounded-[18px]"
-          transition:name="surface"
-          aria-hidden="true"
-        >
-        </div>
-        <a class="relative z-[1] whitespace-nowrap text-[0.95rem] font-bold tracking-[-0.01em] text-ink no-underline" href="/">{SITE.author}</a>
-        <Nav />
-      </header>
+    <NavLoading />
+    <div class="home-wrap relative z-[1] flex min-h-screen flex-col gap-5 px-5 pb-5" transition:name="page-home">
+      <SiteHeader />
       <main class="flex flex-1 items-center justify-center">
         <slot />
       </main>
@@ -74,9 +65,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         max-width: 100%;
         padding: var(--space-12) var(--space-8);
         border-radius: 16px;
-        background: color-mix(in srgb, var(--paper) 86%, transparent);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        background: color-mix(in srgb, var(--paper) 92%, transparent);
         border: 1px solid var(--hairline);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
       }

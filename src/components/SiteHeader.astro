@@ -1,0 +1,32 @@
+---
+import { SITE } from '../consts'
+import Nav from './Nav.astro'
+
+// Site-wide floating glass-pill header, sticky to the top on every page. The
+// whole <header> carries transition:name="surface" so the entire pill — its
+// frosted glass AND its brand/nav text — is one stable view-transition group
+// held perfectly still across navigations (see transitions.css). If only the
+// glass carried the name, the text would ride in the cross-fading content
+// group and blink on every page change. The outer band is pointer-events-none
+// so its transparent padding never intercepts clicks on the content beneath.
+---
+
+<div class="pointer-events-none sticky top-0 z-50 pt-4 pb-2">
+  <header
+    class="site-header pointer-events-auto relative mx-auto flex w-full max-w-[44rem] items-center justify-between gap-6 px-[1.4rem] py-[0.7rem] max-[640px]:flex-col max-[640px]:gap-2 [&>.nav]:relative [&>.nav]:z-[1]"
+    transition:name="surface"
+  >
+    <div
+      class="absolute inset-0 z-0 rounded-full border border-hairline bg-[color-mix(in_srgb,var(--paper)_90%,transparent)] shadow-[0_4px_20px_rgba(0,0,0,0.1)] max-[640px]:rounded-[18px]"
+      aria-hidden="true"
+    >
+    </div>
+    <a
+      class="relative z-[1] whitespace-nowrap text-[0.95rem] font-bold tracking-[-0.01em] text-ink no-underline"
+      href="/"
+    >
+      {SITE.author}
+    </a>
+    <Nav />
+  </header>
+</div>

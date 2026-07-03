@@ -5,40 +5,77 @@
    navigation + fade). Astro injects the transition styles and disables them
    under prefers-reduced-motion automatically. */
 
-/* Shared "surface" morph: the homepage nav glass (.masthead-glass, a small
-   frosted pill) and the inner pages' whole content column (.wrap, a tall
-   near-opaque sheet with its content) carry the same transition name. On
-   leaving home the pill grows into the full panel and the page content
-   cross-fades in *as part of* the morph (so nothing pops in afterwards),
-   reading as "the nav glass enlarges and becomes the page". The reverse plays
-   when returning home. Both sit over the same persisted photo background, so
-   the morph happens against a continuous backdrop. */
-::view-transition-group(surface) {
-  animation-duration: 0.55s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+/* Content column. Named groups (transition:name="page" on inner pages'
+   BaseLayout .wrap, "page-home" on the homepage HomeLayout .home-wrap) so the
+   content is captured during Astro's swap — content left in the default `root`
+   layer renders empty mid-navigation. The swap itself is INSTANT (no fade):
+   while a navigation is in flight the content is hidden and replaced by a
+   loading spinner (see NavLoading), and the new content is revealed only once
+   it has loaded — so the page switches immediately to a loading state instead
+   of the old page lingering, and there is no content to cross-fade. */
+::view-transition-group(page),
+::view-transition-group(page-home),
+::view-transition-old(page),
+::view-transition-new(page),
+::view-transition-old(page-home),
+::view-transition-new(page-home) {
+  animation: none !important;
 }
 
-/* The persisted background and controls are their own stable layers: hold them
-   perfectly still (no fade/scale) through every transition, and only paint the
-   current copy, so the photo and the bottom-right FAB never flicker, fade, or
-   jump position mid-navigation. */
+/* Make the whole transition effectively zero-duration. Otherwise the root layer
+   keeps Astro's default ~0.25s fade, which holds the ::view-transition overlay
+   up for that long — and every persisted/live element (frosted sheet, header,
+   FAB) gets covered by it and flickers. With root instant too, nothing lingers;
+   the loading state (NavLoading) provides all the visible feedback instead. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none !important;
+}
+
+/* Force the layer order of the view-transition groups: photo background at the
+   bottom, content above it, the header/nav pill and the control FAB on top. */
+::view-transition-group(site-bg) {
+  z-index: 1 !important;
+}
+::view-transition-group(page-surface) {
+  z-index: 2 !important;
+}
+::view-transition-group(page),
+::view-transition-group(page-home) {
+  z-index: 3 !important;
+}
+::view-transition-group(surface) {
+  z-index: 4 !important;
+}
+::view-transition-group(site-bg-controls) {
+  z-index: 5 !important;
+}
+
+/* Stable layers held perfectly still through every transition: the persisted
+   photo background, its bottom-right control FAB, and the whole shared header
+   (transition:name="surface" wraps the pill's glass AND its brand/nav text).
+   Each keeps only the current copy painted with no fade/scale, so the photo,
+   the FAB, and the nav never flicker, fade, or jump position mid-navigation —
+   the header stays put while the content beneath it swaps. */
 ::view-transition-group(site-bg),
 ::view-transition-group(site-bg-controls),
+::view-transition-group(surface),
+::view-transition-group(page-surface),
 ::view-transition-old(site-bg),
 ::view-transition-new(site-bg),
 ::view-transition-old(site-bg-controls),
-::view-transition-new(site-bg-controls) {
+::view-transition-new(site-bg-controls),
+::view-transition-old(surface),
+::view-transition-new(surface),
+::view-transition-old(page-surface),
+::view-transition-new(page-surface) {
   animation: none !important;
 }
 ::view-transition-old(site-bg),
-::view-transition-old(site-bg-controls) {
-  display: none;
-}
-
+::view-transition-old(site-bg-controls),
 ::view-transition-old(surface),
-::view-transition-new(surface) {
-  animation-duration: 0.55s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+::view-transition-old(page-surface) {
+  display: none;
 }
 
 /* ---------- Motion preferences ---------- */

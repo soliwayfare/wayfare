@@ -1,9 +1,9 @@
 ---
 import { ClientRouter } from 'astro:transitions'
 import { SITE } from '../consts'
-import { withBase } from '../utils/url'
-import Nav from '../components/Nav.astro'
+import SiteHeader from '../components/SiteHeader.astro'
 import SiteBackground from '../components/SiteBackground.astro'
+import NavLoading from '../components/NavLoading.astro'
 import Seo from '../components/Seo.astro'
 import '../styles/global.css'
 
@@ -39,14 +39,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href
   </head>
   <body>
     <SiteBackground />
-    <div class="wrap" transition:name="surface">
-      <div class="page-surface" aria-hidden="true"></div>
-      <header class="site-header">
-        <a class="logo-link" href={withBase('/')}>
-          <h1>{SITE.title}</h1>
-        </a>
-        <Nav />
-      </header>
+    <NavLoading />
+    <div class="wrap" transition:name="page">
+      <div
+        class="page-surface"
+        aria-hidden="true"
+        transition:name="page-surface"
+        transition:persist="page-surface"
+      >
+      </div>
+      <SiteHeader />
       <main class="container">
         <slot />
       </main>
@@ -117,9 +119,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href
     position: absolute;
     inset: 0;
     z-index: 0;
-    background: color-mix(in srgb, var(--paper) 94%, transparent);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    /* Semi-transparent solid (no backdrop-filter): a blurred sheet can't be
+       captured by view transitions, which is what made it flash opaque / vanish
+       mid-navigation. A plain translucent panel snapshots identically, so it
+       transitions cleanly. */
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
     border-left: 1px solid var(--hairline);
     border-right: 1px solid var(--hairline);
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
@@ -131,31 +135,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href
     margin: 0 auto;
     padding: 0 1.5rem;
     flex: 1 0 auto;
-  }
-
-  .site-header {
-    width: 100%;
-    max-width: var(--measure);
-    margin: 0 auto;
-    padding: var(--space-12) 1.5rem var(--space-8);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-2) var(--space-6);
-  }
-
-  .logo-link {
-    text-decoration: none;
-    display: inline-block;
-  }
-
-  .logo-link h1 {
-    margin: 0;
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: var(--ink);
-    letter-spacing: -0.015em;
   }
 
   .site-footer {
@@ -180,7 +159,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href
     border-bottom-color: var(--accent);
   }
 
-  .wrap > .site-header,
   .wrap > .container,
   .wrap > .site-footer {
     position: relative;
@@ -197,11 +175,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href
   @media (max-width: 640px) {
     body {
       font-size: 16px;
-    }
-
-    .site-header {
-      padding-top: var(--space-8);
-      padding-bottom: var(--space-6);
     }
   }
 </style>
