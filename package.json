@@ -28,7 +28,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.2",
+    "@iconify-json/lucide": "^1.2.134",
+    "@iconify-json/simple-icons": "^1.2.96",
     "@illustrix/shared-configs": "^1.0.0",
-    "gray-matter": "^4.0.3"
+    "gray-matter": "^4.0.3",
+    "unplugin-icons": "^24.0.0"
   }
 }

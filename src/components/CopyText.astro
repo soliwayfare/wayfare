@@ -1,0 +1,107 @@
+---
+import CopyIcon from '~icons/lucide/copy'
+
+interface Props {
+  label: string
+  value: string
+}
+
+const { label, value } = Astro.props
+---
+
+<button
+  class="copy-text"
+  type="button"
+  data-copy-value={value}
+  aria-label={`复制${label} ${value}`}
+>
+  <span class="copy-text-label">{label}</span>
+  <span class="copy-text-value">{value}</span>
+  <span class="copy-text-action">
+    <CopyIcon class="copy-text-icon" aria-hidden="true" />
+    <span class="copy-text-status" aria-live="polite">复制</span>
+  </span>
+</button>
+
+<script>
+  function setupCopyText() {
+    document.querySelectorAll<HTMLButtonElement>('.copy-text').forEach(button => {
+      if (button.dataset.copyReady === 'true') return
+      button.dataset.copyReady = 'true'
+
+      button.addEventListener('click', async () => {
+        const value = button.dataset.copyValue
+        const status = button.querySelector<HTMLElement>('.copy-text-status')
+        if (!value || !status) return
+
+        try {
+          await navigator.clipboard.writeText(value)
+          status.textContent = '已复制'
+        } catch {
+          status.textContent = '复制失败'
+        }
+
+        window.setTimeout(() => {
+          status.textContent = '复制'
+        }, 1800)
+      })
+    })
+  }
+
+  setupCopyText()
+  document.addEventListener('astro:page-load', setupCopyText)
+</script>
+
+<style>
+  .copy-text {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2rem;
+    margin-top: var(--space-2);
+    padding: 0.3rem 0.55rem;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--paper-raised);
+    color: var(--ink-faint);
+    font: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition:
+      color var(--dur) var(--ease),
+      border-color var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
+  }
+
+  .copy-text:hover,
+  .copy-text:focus-visible {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
+
+  .copy-text-label {
+    color: var(--ink-soft);
+  }
+
+  .copy-text-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .copy-text-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding-left: var(--space-2);
+    border-left: 1px solid var(--hairline);
+    color: var(--accent-strong);
+    font-weight: 600;
+  }
+
+  .copy-text-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex: 0 0 auto;
+  }
+</style>

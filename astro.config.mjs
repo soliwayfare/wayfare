@@ -7,6 +7,7 @@ import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 import expressiveCode from 'astro-expressive-code'
+import Icons from 'unplugin-icons/vite'
 
 // https://astro.build
 export default defineConfig({
@@ -25,7 +26,7 @@ export default defineConfig({
     processor: unified(),
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), Icons({ compiler: 'astro' })],
   },
   integrations: [
     react(),
