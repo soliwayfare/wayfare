@@ -83,8 +83,10 @@ const recent = (await getSortedPosts()).slice(0, 4);
   }
 
   .avatar {
+    display: block;
     width: 88px;
     height: 88px;
+    margin-inline: auto;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid var(--hairline);
