@@ -1,5 +1,6 @@
 // @ts-check
 import { unified } from '@astrojs/markdown-remark'
+import mdx from '@astrojs/mdx'
 import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers'
@@ -45,6 +46,7 @@ export default defineConfig({
         },
       },
     }),
+    mdx(),
     sitemap(),
   ],
   redirects: {

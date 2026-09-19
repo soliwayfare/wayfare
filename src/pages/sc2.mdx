@@ -1,0 +1,70 @@
+---
+title: StarCraft II
+description: StarCraft II 游戏群组入口。
+---
+
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+export const discordUrl = 'https://oopz.cn/i/IWgaj6'
+export const qqUrl = 'https://qm.qq.com/q/KisQlkHSKY'
+export const communities = [
+  {
+    name: 'Oopz 语音房间',
+    description: '加入群组，进入语音频道。',
+    meta: '群组 ID: 365955613',
+    action: '加入 Oopz 群组',
+    href: discordUrl,
+  },
+  {
+    name: 'QQ 群',
+    description: '加入群聊，交流、组队和约战。',
+    meta: '群号: 142367990',
+    action: '加入 QQ 群',
+    href: qqUrl,
+  },
+]
+
+<BaseLayout title={frontmatter.title} description={frontmatter.description}>
+  <article className="pt-2">
+    <header className="border-b border-hairline pb-8">
+      <p className="m-0 text-xs font-bold uppercase tracking-[0.12em] text-accent">
+        Community
+      </p>
+      <h1 className="mt-2 mb-0 text-4xl font-bold leading-tight text-ink max-[640px]:text-3xl">
+        StarCraft II
+      </h1>
+      <p className="mt-4 mb-0 max-w-xl text-base leading-7 text-ink-soft">
+        来语音房间，一起聊天吹水。组队，约 RPG。
+      </p>
+    </header>
+
+    <div className="mx-auto my-12 grid w-full max-w-md grid-cols-1 gap-4 max-[640px]:my-8">
+      {communities.map(community => (
+        <section
+          className="flex min-h-56 flex-col items-center border-y border-hairline px-5 py-8 text-center"
+          key={community.name}
+        >
+          <h2 className="mt-0 mb-1 text-lg font-bold text-ink">
+            {community.name}
+          </h2>
+          <p className="m-0 text-sm leading-6 text-ink-faint">
+            {community.description}
+          </p>
+          {community.meta && (
+            <p className="mt-2 mb-0 font-mono text-xs text-ink-faint">
+              {community.meta}
+            </p>
+          )}
+          <a
+            className="mt-auto inline-flex min-h-11 items-center justify-center rounded-site border border-accent bg-accent px-5 py-3 font-semibold text-white no-underline shadow-sm transition-[background-color,border-color,transform,box-shadow] duration-[var(--dur)] ease-[var(--ease)] hover:-translate-y-0.5 hover:border-accent-strong hover:bg-accent-strong hover:shadow-md"
+            href={community.href}
+            target="_blank"
+            rel="noopener"
+          >
+            {community.action}
+          </a>
+        </section>
+      ))}
+    </div>
+  </article>
+</BaseLayout>

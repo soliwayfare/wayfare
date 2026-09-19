@@ -40,6 +40,7 @@ export const BLOG_BASE = '/blog';
 export const NAV: { label: string; href: string; external?: boolean }[] = [
   { label: 'HOME', href: '/' },
   { label: 'STACK', href: '/stack/' },
+  { label: 'SC2', href: '/sc2/' },
   { label: 'BLOG', href: '/blog/' },
   { label: 'ARCHIVE', href: '/blog/archives/' },
   { label: 'MASTODON', href: '/blog/mastodon/' },
