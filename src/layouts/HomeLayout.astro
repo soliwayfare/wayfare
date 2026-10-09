@@ -40,16 +40,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       </main>
     </div>
 
-    <script>
-      // Decode the obfuscated email in the home card. The rotating background and
-      // its controls now live in <SiteBackground /> (site-wide, persisted).
-      function decodeEmail() {
-        const mail = document.querySelector('#code');
-        if (mail) mail.textContent = atob('aUBpd2oubW9l');
-      }
-      document.addEventListener('astro:page-load', decodeEmail);
-    </script>
-
     <style is:global>
       /* Homepage-only layout, scoped to `body.home`. The rotating background
          (.bg), progress indicator and bg controls are site-wide now and live in
