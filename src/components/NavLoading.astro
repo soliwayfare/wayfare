@@ -1,83 +1,190 @@
 ---
-// Keep the current page visible until the next page is ready. Only slow
-// navigations show a progress indicator; swapping never hides the content.
+ // Slow navigations fade the content before revealing the persisted indicator.
 ---
 
-<div id="nav-loading" class="nav-loading" aria-hidden="true" transition:persist>
-  <span class="nav-loading__spinner"></span>
+<div id="nav-loading" class="nav-loading" role="status" aria-label="Loading" transition:persist>
+  <div class="nav-loading__motion" aria-hidden="true">
+    <span class="nav-loading__ring"></span>
+    <span class="nav-loading__ring nav-loading__ring--inner"></span>
+  </div>
+  <span class="nav-loading__label">Loading</span>
+  <span class="nav-loading__bars" aria-hidden="true">
+    <i></i><i></i><i></i><i></i><i></i>
+  </span>
 </div>
 
 <script>
-  import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
+  import type {
+    TransitionBeforePreparationEvent,
+    TransitionBeforeSwapEvent,
+  } from 'astro:transitions/client';
 
-  // Wire once per session; <ClientRouter /> keeps the same window so these
-  // document-level listeners survive navigations.
-  const w = window as any;
+  const w = window as typeof window & { __navLoading?: boolean };
   if (!w.__navLoading) {
     w.__navLoading = true;
+    const root = document.documentElement;
+    const DELAY = 350;
+    const FADE = 180;
+    const MIN_VISIBLE = 300;
+    let sequence = 0;
+    let fadeTimer: number | undefined;
+    let showTimer: number | undefined;
+
+    const reset = () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(showTimer);
+      root.classList.remove('is-navigation-fading', 'is-loading');
+      document.querySelector('main')?.removeAttribute('aria-busy');
+    };
+
+    document.addEventListener('astro:before-preparation', (event) => {
+      const preparation = event as TransitionBeforePreparationEvent;
+      const current = ++sequence;
+      reset();
+      let fadedAt = 0;
+      document.querySelector('main')?.setAttribute('aria-busy', 'true');
+
+      fadeTimer = window.setTimeout(() => {
+        fadedAt = performance.now();
+        root.classList.add('is-navigation-fading');
+        showTimer = window.setTimeout(() => {
+          root.classList.add('is-loading');
+        }, FADE);
+      }, DELAY);
+
+      preparation.signal.addEventListener('abort', () => {
+        if (current === sequence) reset();
+      }, { once: true });
+
+      const loader = preparation.loader;
+      preparation.loader = async () => {
+        try {
+          await loader();
+          // Once fading starts, finish the sequence rather than flash a loader.
+          if (fadedAt && !preparation.signal.aborted) {
+            const wait = Math.max(0, fadedAt + FADE + MIN_VISIBLE - performance.now());
+            if (wait) await new Promise<void>((resolve) => {
+              const timer = window.setTimeout(resolve, wait);
+              preparation.signal.addEventListener('abort', () => {
+                clearTimeout(timer);
+                resolve();
+              }, { once: true });
+            });
+          }
+        } catch (error) {
+          if (current === sequence) reset();
+          throw error;
+        }
+      };
+    });
+
     document.addEventListener('astro:before-swap', (event) => {
       (event as TransitionBeforeSwapEvent).viewTransition.skipTransition();
     });
-    const root = document.documentElement;
-    const SPINNER_DELAY = 150; // don't show the spinner for faster loads
-    let showTimer: number | undefined;
-
-    document.addEventListener('astro:before-preparation', () => {
-      // Reveal the spinner only if the load is taking a while.
-      clearTimeout(showTimer);
-      showTimer = window.setTimeout(() => {
-        root.classList.add('is-loading');
-      }, SPINNER_DELAY);
-    });
-
-    document.addEventListener('astro:after-preparation', () => {
-      clearTimeout(showTimer);
-      root.classList.remove('is-loading');
-    });
+    document.addEventListener('astro:after-swap', reset);
+    document.addEventListener('astro:page-load', reset);
   }
 </script>
 
 <style is:global>
+  main,
+  .site-footer {
+    transition: opacity 180ms ease;
+  }
+
+  html.is-navigation-fading main,
+  html.is-navigation-fading .site-footer {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .nav-loading {
-    /* Centered in the content column, below the sticky header — not a
-       full-screen overlay. */
     position: fixed;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     top: max(38vh, 12rem);
     z-index: 40;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.15s ease;
+    transition: opacity 160ms ease;
+    color: var(--ink);
   }
-  /* Only shown once a navigation is slow enough (is-loading), not merely while
-     navigating. */
+
   html.is-loading .nav-loading {
     opacity: 1;
     visibility: visible;
   }
 
-  .nav-loading__spinner {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 3px solid color-mix(in srgb, var(--ink) 16%, transparent);
-    border-top-color: var(--accent);
-    animation: nav-spin 0.7s linear infinite;
+  .nav-loading__motion {
+    position: relative;
+    width: 56px;
+    height: 56px;
   }
 
+  .nav-loading__ring {
+    position: absolute;
+    inset: 0;
+    border: 2px solid color-mix(in srgb, var(--ink) 12%, transparent);
+    border-top-color: var(--accent);
+    border-right-color: var(--accent);
+    border-radius: 50%;
+    animation: nav-spin 1.2s linear infinite;
+  }
+
+  .nav-loading__ring--inner {
+    inset: 10px;
+    border-color: transparent;
+    border-bottom-color: var(--ink-soft);
+    border-left-color: var(--ink-soft);
+    animation-direction: reverse;
+    animation-duration: 0.9s;
+  }
+
+  .nav-loading__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .nav-loading__bars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 16px;
+  }
+
+  .nav-loading__bars i {
+    display: block;
+    width: 4px;
+    height: 12px;
+    border-radius: 2px;
+    background: var(--accent);
+    animation: nav-pulse 1s ease-in-out infinite;
+  }
+
+  .nav-loading__bars i:nth-child(2) { animation-delay: 100ms; }
+  .nav-loading__bars i:nth-child(3) { animation-delay: 200ms; }
+  .nav-loading__bars i:nth-child(4) { animation-delay: 300ms; }
+  .nav-loading__bars i:nth-child(5) { animation-delay: 400ms; }
+
   @keyframes nav-spin {
-    to {
-      transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes nav-pulse {
+    0%, 100% { transform: scaleY(0.4); opacity: 0.35; }
+    50% { transform: scaleY(1); opacity: 1; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .nav-loading__spinner {
-      animation-duration: 1.4s;
+    .nav-loading__ring,
+    .nav-loading__bars i {
+      animation: none;
     }
   }
 </style>
