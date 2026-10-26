@@ -35,7 +35,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href
       articleTitle={title}
       publishedDate={publishedDate}
     />
-    <ClientRouter />
+    <ClientRouter fallback="swap" />
   </head>
   <body>
     <SiteBackground />

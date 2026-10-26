@@ -28,7 +28,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       type="website"
       locale="en_US"
     />
-    <ClientRouter />
+    <ClientRouter fallback="swap" />
   </head>
   <body class="home">
     <SiteBackground />
