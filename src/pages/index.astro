@@ -71,7 +71,7 @@ const recent = (await getSortedPosts()).slice(0, 4);
 
     <footer class="contact">
       <span>Email: <a class="contact-link" id="code">••••••</a></span>
-      <script is:inline>
+      <script is:inline data-astro-rerun>
         (() => {
           const mail = document.querySelector('#code');
           if (!mail) return;
