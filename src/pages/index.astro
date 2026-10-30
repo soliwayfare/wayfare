@@ -1,10 +1,5 @@
 ---
 import HomeLayout from '../layouts/HomeLayout.astro';
-import { getSortedPosts, postPath } from '../utils/posts';
-import { withBase } from '../utils/url';
-import { formatDate, isoDate } from '../utils/date';
-
-const recent = (await getSortedPosts()).slice(0, 4);
 ---
 
 <HomeLayout>
@@ -49,25 +44,6 @@ const recent = (await getSortedPosts()).slice(0, 4);
         </a>
       </div>
     </header>
-
-    {recent.length > 0 && (
-      <section class="latest">
-        <div class="latest-head">
-          <h2>Latest writing</h2>
-          <a class="latest-all" href={withBase('/')}>All posts →</a>
-        </div>
-        <ul class="latest-list">
-          {recent.map((post) => (
-            <li>
-              <a class="latest-item" href={withBase(postPath(post))}>
-                <time datetime={isoDate(post.data.date)}>{formatDate(post.data.date)}</time>
-                <span class="latest-title" set:html={post.data.title} />
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )}
 
     <footer class="contact">
       <span>Email: <a class="contact-link" id="code">••••••</a></span>
@@ -158,87 +134,13 @@ const recent = (await getSortedPosts()).slice(0, 4);
     transform: translateY(-2px);
   }
 
-  /* ---------- Latest writing ---------- */
-  .latest {
-    margin-top: var(--space-8);
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--hairline);
-  }
-
-  .latest-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-4);
-    margin-bottom: var(--space-2);
-  }
-
-  .latest-head h2 {
-    margin: 0;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-  }
-
-  .latest-all {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--accent);
-    transition: color var(--dur) var(--ease);
-  }
-
-  .latest-all:hover {
-    color: var(--accent-strong);
-  }
-
-  .latest-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .latest-item {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-4);
-    padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--hairline);
-  }
-
-  .latest-list li:last-child .latest-item {
-    border-bottom: none;
-  }
-
-  .latest-item time {
-    flex-shrink: 0;
-    width: 6.5rem;
-    color: var(--ink-faint);
-    font-size: 0.8rem;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .latest-title {
-    color: var(--ink-soft);
-    font-size: 0.95rem;
-    line-height: 1.4;
-    transition: color var(--dur) var(--ease);
-  }
-
-  .latest-item:hover .latest-title {
-    color: var(--accent);
-  }
-
   /* ---------- Contact ---------- */
   .contact {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--space-2) var(--space-6);
-    margin-top: var(--space-8);
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--hairline);
+    margin-top: var(--space-6);
     color: var(--ink-faint);
     font-size: 0.8rem;
   }
@@ -257,13 +159,6 @@ const recent = (await getSortedPosts()).slice(0, 4);
   @media (max-width: 640px) {
     .profile-name {
       font-size: 1.45rem;
-    }
-    .latest-item {
-      flex-direction: column;
-      gap: 0;
-    }
-    .latest-item time {
-      width: auto;
     }
   }
 </style>
