@@ -9,8 +9,17 @@ import HeadphonesIcon from '~icons/lucide/headphones'
 import QQIcon from '~icons/simple-icons/qq'
 
 export const oopzUrl = 'https://oopz.cn/i/IWgaj6'
+export const kookUrl = 'https://kook.vip/yDMtbm'
 export const qqUrl = 'https://qm.qq.com/q/KisQlkHSKY'
 export const communities = [
+  {
+    icon: HeadphonesIcon,
+    name: 'KOOK 语音频道',
+    recommended: true,
+    description: '加入频道，一起语音聊天和组队。',
+    action: '加入 KOOK 频道',
+    href: kookUrl,
+  },
   {
     icon: HeadphonesIcon,
     name: 'Oopz 语音房间',
@@ -55,8 +64,13 @@ export const communities = [
             key={community.name}
           >
             <Icon className="mb-5 size-8 text-ink" aria-hidden="true" />
-            <h2 className="mt-0 mb-1 text-lg font-bold text-ink">
+            <h2 className="mt-0 mb-1 flex flex-wrap items-center justify-center gap-2 text-lg font-bold text-ink">
               {community.name}
+              {community.recommended && (
+                <span className="rounded-full border border-accent/25 bg-accent/10 px-2 py-0.5 text-xs font-medium leading-5 text-accent-strong">
+                  推荐
+                </span>
+              )}
             </h2>
             <p className="m-0 text-sm leading-6 text-ink-faint">
               {community.description}
@@ -69,7 +83,9 @@ export const communities = [
             >
               {community.action}
             </a>
-            <CopyText label={community.idLabel} value={community.idValue} />
+            {community.idValue && (
+              <CopyText label={community.idLabel} value={community.idValue} />
+            )}
           </section>
         )
       })}
